@@ -1,0 +1,151 @@
+.auth-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    min-height: 100vh;
+}
+
+.picture {
+    width: 50%;
+    height: 100vh;
+    background-image: url(https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNjUyOXwwfDF8c2VhcmNofDJ8fGF1dGhvcnxlbnwwfHx8fDE2OTY5NzE3NTg&ixlib=rb-4.0.3&q=80&w=1080);
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.picture::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.auth-content {
+    width: 50%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    background-color: #f8f9fa;
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.auth-header h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #2d3748;
+    margin-bottom: 0.5rem;
+}
+
+.auth-header p {
+    font-size: 1rem;
+    color: #718096;
+}
+
+.registration-form {
+    width: 100%;
+    /* max-width: 400px; */
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.form-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.input-group label {
+    font-size: 0.9rem;
+    color: #4a5568;
+    font-weight: 500;
+    text-align: left;
+    /* Aligns the label to the left */
+    display: block;
+    /* Ensures the label spans the full width */
+    margin-bottom: 0.1rem;
+    margin-top: 0.5rem;
+    /* Adds spacing between the label and the input */
+}
+
+.error-message{
+    font-size: 0.7rem;
+        font-weight: 500;
+        text-align: left;
+        display: block;
+        /* Ensures the label spans the full width */
+        margin-bottom: 0.1rem;
+        /* margin-top: 0.5rem; */
+        color: red;
+        padding-left: 3px;
+        /* Adds spacing between the label and the input */
+}
+
+.input-group input {
+    padding: 0.75rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    font-size: 1rem;
+    color: #000;
+    transition: border-color 0.3s ease;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+}
+
+.submit-button {
+    padding: 0.75rem;
+    background-color: #6b46c1;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.submit-button:hover {
+    background-color: #553c9a;
+}
+
+.form-footer {
+    text-align: center;
+    margin-top: 1rem;
+}
+
+.form-footer p {
+    font-size: 0.9rem;
+    color: #718096;
+}
+
+.form-footer a {
+    color: #6b46c1;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.form-footer a:hover {
+    text-decoration: underline;
+}
