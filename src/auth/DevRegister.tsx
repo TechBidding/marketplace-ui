@@ -3,6 +3,7 @@ import './auth.css'
 import { z } from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { userHttp } from '@/utility/api'
+import { useNavigate } from "react-router-dom"
 
 
 
@@ -23,6 +24,7 @@ export const DevRegister = () => {
     const { register, handleSubmit, formState: { errors }, watch } = useForm<IDevRegisterInput>({
         resolver: zodResolver(devRegisterSchema)
     })
+    const navigate = useNavigate()
     const onSubmit: SubmitHandler<IDevRegisterInput> = (data) => {
         console.log("data", data)
         if (data.password !== data.confirmPassword) {
@@ -34,9 +36,8 @@ export const DevRegister = () => {
         try {
             userHttp.post('auth/developer-register', rest).then((res) => {
                 console.log("res", res)
-                if (res.status === 200) {
                     alert("Registration successful")
-                }
+                    navigate("/dev")
             }).catch((error) => {
                 console.error("Registration failed", error.response.data)
                 alert("Registration failed")
@@ -109,7 +110,7 @@ export const DevRegister = () => {
                     <button type="submit" className="submit-button">Register</button>
                 </div>
                 <div className="form-footer">
-                    <p>Already have an account? <a href="/login">Sign in</a></p>
+                    <p>Already have an account? <a href="/dev/signin">Sign in</a></p>
                 </div>
             </form>
         </div>

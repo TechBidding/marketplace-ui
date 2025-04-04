@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import './Auth.css';
 
 interface AuthProps {
@@ -6,14 +6,23 @@ interface AuthProps {
 }
 
 export const Auth = ({ children }: AuthProps) => {
+    const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
+
+    useEffect(() => {
+        document.documentElement.className = theme;
+    }, [theme]);
     return (
-        <div className="auth-container">
+        <>
+            <div className="auth-container">
+
+                <div className="auth-content">
+                    {children}
+                </div>
+                <div className="picture">
+                </div>
+            </div>
             
-            <div className="auth-content">
-                {children}
-            </div>
-            <div className="picture">
-            </div>
-        </div>
+        </>
+        
     );
 };

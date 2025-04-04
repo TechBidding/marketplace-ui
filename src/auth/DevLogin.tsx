@@ -3,89 +3,66 @@ import './auth.css'
 import { z } from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { userHttp } from '@/utility/api'
+import { useNavigate } from "react-router-dom"
+import { login, selectIsLoggedIn } from "@/store/AuthSlice"
+import { useDispatch, useSelector } from "react-redux"
+import { useAppSelector } from "@/store/Store"
+import { toast } from "sonner"
 
 
 
 const devLoginSchema = z.object({
-  name: z.string().min(1, { message: "Name is required" }),
-  email: z.string().email({ message: "Invalid email address" }),
-  userName: z.string().min(1, { message: "Username is required" }),
-  phoneNumber: z.string().min(1, { message: "Phone number is required" }),
-  password: z.string().min(6, { message: "Password must be at least 6 characters" }),
-  confirmPassword: z.string().min(6, { message: "Confirm password is required" })
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords do not match",
+  identifier: z.string(),
+  password: z.string().min(4, { message: "Password must be at least 4 characters" }),
 })
 
-type IDevRegisterInput = z.infer<typeof devLoginSchema>
+type IDevLoginInput = z.infer<typeof devLoginSchema>
 
 export const DevLogin = () => {
-  const { register, handleSubmit, formState: { errors }, watch } = useForm<IDevRegisterInput>({
+  const { register, handleSubmit, formState: { errors } } = useForm<IDevLoginInput>({
     resolver: zodResolver(devLoginSchema)
   })
-  const onSubmit: SubmitHandler<IDevRegisterInput> = (data) => {
-    console.log("data", data)
-    if (data.password !== data.confirmPassword) {
-      alert("Passwords do not match");
-      return;
-    }
+  const navigate = useNavigate()
+  const isLoggedIn = useSelector((state: any) => state.auth.isLoggedIn);
+  console.log("isLoggedIn", isLoggedIn)
+  const isLoggedIn2 = useAppSelector(selectIsLoggedIn);
+  console.log("isLoggedIn2", isLoggedIn2)
+  const dispatch = useDispatch()
 
-    const { confirmPassword, ...rest } = data;
-    try {
-      userHttp.post('auth/developer-register', rest).then((res) => {
+
+  const onSubmit: SubmitHandler<IDevLoginInput> = (data) => {
+      userHttp.post('auth/developer-login', data).then((res) => {
         console.log("res", res)
-        if (res.status === 200) {
-          alert("Registration successful")
-        }
-      }).catch((error) => {
-        console.error("Registration failed", error.response.data)
-        alert("Registration failed")
-      })
-    }
-    catch (error) {
-      console.error("Registration failed", error)
-      alert("Registration failed")
-    }
-  }
-  const password = watch("password");
-  const confirmPassword = watch("confirmPassword");
+        dispatch(login())
+        toast.success("Login successful")
+        navigate("/dev")
 
+      }).catch((error) => {
+        toast.error("Login failed. Please check your credentials.", {
+          description: error.response.data.message,
+        })
+      })
+  }
 
   return (
-
     <div className="">
       <div className="auth-header">
         <h1>Welcome to developer's marketplace</h1>
-        <p>Please enter your details to register</p>
+        <p>Please enter your details to login</p>
       </div>
       <form onSubmit={handleSubmit(onSubmit)} className="registration-form">
         <div className="form-fields">
           <div className="input-group">
-            <label>Name</label>
-            <input {...register("name")} placeholder="Enter your name" />
-            {errors.name && (
-              <p className="error-message" role="alert">{errors.name.message}</p>
-            )}
-          </div>
-          <div className="input-group">
-            <label>Email</label>
-            <input {...register("email", { required: true })} placeholder="Enter your email" type="email" />
-            {errors.email && (
-              <p className="error-message" role="alert">{errors.email.message}</p>
-            )}
-          </div>
-          <div className="input-group">
-            <label>Username</label>
-            <input {...register("userName", { required: true })} placeholder="Enter unique username" />
-            {errors.userName && (
-              <p className="error-message" role="alert">{errors.userName.message}</p>
-            )}
-          </div>
-          <div className="input-group">
-            <label>Phone Number</label>
-            <input {...register("phoneNumber", { required: true })} placeholder="Enter your phone number" type="tel" />
-            {errors.phoneNumber && (
-              <p className="error-message" role="alert">{errors.phoneNumber.message}</p>
+            <label>Username / Email / Phone</label>
+            <input
+              {...register("identifier", {
+                required: "Please enter your email, username or phone number"
+              })}
+              placeholder="Enter your email, username or phone number"
+              type="text"
+            />
+            {errors.identifier && (
+              <p className="error-message" role="alert">{errors.identifier.message}</p>
             )}
           </div>
           <div className="input-group">
@@ -95,21 +72,10 @@ export const DevLogin = () => {
               <p className="error-message" role="alert">{errors.password.message}</p>
             )}
           </div>
-          <div className="input-group">
-            <label>Confirm Password</label>
-            <input {...register("confirmPassword",
-              { required: true, validate: (value) => value === password || "Passwords do not match", })} placeholder="Confirm your password" type="password" />
-            {errors.confirmPassword && (
-              <p className="error-message" role="alert">{errors.confirmPassword.message}</p>
-            )}
-            {password && confirmPassword && password !== confirmPassword && (
-              <p className="error-message" role="alert">Passwords do not match</p>
-            )}
-          </div>
-          <button type="submit" className="submit-button">Register</button>
+          <button type="submit" className="submit-button">Sign In</button>
         </div>
         <div className="form-footer">
-          <p>Already have an account? <a href="/login">Sign in</a></p>
+          <p>Don't have an account? <a href="/dev/signup">Sign up</a></p>
         </div>
       </form>
     </div>

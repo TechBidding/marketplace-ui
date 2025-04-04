@@ -3,6 +3,7 @@ import './auth.css'
 import { z } from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { userHttp } from '@/utility/api'
+import { useNavigate } from "react-router-dom"
 
 
 
@@ -11,20 +12,21 @@ const clientRegisterSchema = z.object({
     email: z.string().email({ message: "Invalid email address" }),
     userName: z.string().min(1, { message: "Username is required" }),
     phoneNumber: z.string().min(1, { message: "Phone number is required" }),
+    company: z.string().optional(),
     password: z.string().min(6, { message: "Password must be at least 6 characters" }),
     confirmPassword: z.string().min(6, { message: "Confirm password is required" })
 }).refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
 })
 
-type IDevRegisterInput = z.infer<typeof clientRegisterSchema>
+type IClientRegisterInput = z.infer<typeof clientRegisterSchema>
 
 export const ClientRegister = () => {
-    const { register, handleSubmit, formState: { errors }, watch } = useForm<IDevRegisterInput>({
+    const { register, handleSubmit, formState: { errors }, watch } = useForm<IClientRegisterInput>({
         resolver: zodResolver(clientRegisterSchema)
     })
-    const onSubmit: SubmitHandler<IDevRegisterInput> = (data) => {
-        console.log("data", data)
+    const navigate = useNavigate()
+    const onSubmit: SubmitHandler<IClientRegisterInput> = (data) => {
         if (data.password !== data.confirmPassword) {
             alert("Passwords do not match");
             return;
@@ -32,11 +34,12 @@ export const ClientRegister = () => {
 
         const { confirmPassword, ...rest } = data;
         try {
-            userHttp.post('auth/developer-register', rest).then((res) => {
+            userHttp.post('auth/client-register', rest).then((res) => {
                 console.log("res", res)
-                if (res.status === 200) {
+                
                     alert("Registration successful")
-                }
+                    navigate("/client")
+                
             }).catch((error) => {
                 console.error("Registration failed", error.response.data)
                 alert("Registration failed")
@@ -52,7 +55,6 @@ export const ClientRegister = () => {
 
 
     return (
-
         <div className="">
             <div className="auth-header">
                 <h1>Welcome to developer's marketplace</h1>
@@ -60,7 +62,7 @@ export const ClientRegister = () => {
             </div>
             <form onSubmit={handleSubmit(onSubmit)} className="registration-form">
                 <div className="form-fields">
-                    <div className="input-group">
+                    <div className="input-group" style={{ marginTop: "-10px" }}>
                         <label>Name</label>
                         <input {...register("name")} placeholder="Enter your name" />
                         {errors.name && (
@@ -89,6 +91,13 @@ export const ClientRegister = () => {
                         )}
                     </div>
                     <div className="input-group">
+                        <label>Company</label>
+                        <input {...register("company")} placeholder="Enter your company name" type="input" />
+                        {errors.company && (
+                            <p className="error-message" role="alert">{errors.company.message}</p>
+                        )}
+                    </div>
+                    <div className="input-group">
                         <label>Password</label>
                         <input {...register("password", { required: true })} placeholder="Enter your password" type="password" />
                         {errors.password && (
@@ -109,7 +118,7 @@ export const ClientRegister = () => {
                     <button type="submit" className="submit-button">Register</button>
                 </div>
                 <div className="form-footer">
-                    <p>Already have an account? <a href="/login">Sign in</a></p>
+                    <p>Already have an account? <a href="/client/signin">Sign in</a></p>
                 </div>
             </form>
         </div>
