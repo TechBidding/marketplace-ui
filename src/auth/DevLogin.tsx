@@ -1,14 +1,13 @@
-import { useForm, SubmitHandler } from "react-hook-form"
+import { useForm, SubmitHandler, set } from "react-hook-form"
 import './auth.css'
 import { z } from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { userHttp } from '@/utility/api'
 import { useNavigate } from "react-router-dom"
-import { login, selectIsLoggedIn } from "@/store/AuthSlice"
-import { useDispatch, useSelector } from "react-redux"
-import { useAppSelector } from "@/store/Store"
+import { login } from "@/store/AuthSlice"
+import { useAppDispatch } from "@/store/Store"
 import { toast } from "sonner"
-
+import { useState } from "react"
 
 
 const devLoginSchema = z.object({
@@ -22,22 +21,20 @@ export const DevLogin = () => {
   const { register, handleSubmit, formState: { errors } } = useForm<IDevLoginInput>({
     resolver: zodResolver(devLoginSchema)
   })
+  const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate()
-  const isLoggedIn = useSelector((state: any) => state.auth.isLoggedIn);
-  console.log("isLoggedIn", isLoggedIn)
-  const isLoggedIn2 = useAppSelector(selectIsLoggedIn);
-  console.log("isLoggedIn2", isLoggedIn2)
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch();
 
 
   const onSubmit: SubmitHandler<IDevLoginInput> = (data) => {
-      userHttp.post('auth/developer-login', data).then((res) => {
-        console.log("res", res)
+      setIsLoading(true)
+    userHttp.post('auth/developer-login', data).then((res) => {
+        setIsLoading(false)
         dispatch(login())
         toast.success("Login successful")
         navigate("/dev")
-
-      }).catch((error) => {
+    }).catch((error) => {
+        setIsLoading(false)
         toast.error("Login failed. Please check your credentials.", {
           description: error.response.data.message,
         })
@@ -60,6 +57,7 @@ export const DevLogin = () => {
               })}
               placeholder="Enter your email, username or phone number"
               type="text"
+              disabled={isLoading}
             />
             {errors.identifier && (
               <p className="error-message" role="alert">{errors.identifier.message}</p>
@@ -67,12 +65,12 @@ export const DevLogin = () => {
           </div>
           <div className="input-group">
             <label>Password</label>
-            <input {...register("password", { required: true })} placeholder="Enter your password" type="password" />
+            <input {...register("password", { required: true })} placeholder="Enter your password" type="password" disabled={isLoading} />
             {errors.password && (
               <p className="error-message" role="alert">{errors.password.message}</p>
             )}
           </div>
-          <button type="submit" className="submit-button">Sign In</button>
+          <button type="submit" className="submit-button" disabled={isLoading}>Sign In</button>
         </div>
         <div className="form-footer">
           <p>Don't have an account? <a href="/dev/signup">Sign up</a></p>

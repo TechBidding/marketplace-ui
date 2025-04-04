@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { userHttp } from '@/utility/api'
 import { useNavigate } from "react-router-dom"
+import { toast } from "sonner"
 
 
 
@@ -33,22 +34,19 @@ export const ClientRegister = () => {
         }
 
         const { confirmPassword, ...rest } = data;
-        try {
-            userHttp.post('auth/client-register', rest).then((res) => {
-                console.log("res", res)
-                
-                    alert("Registration successful")
-                    navigate("/client")
-                
-            }).catch((error) => {
-                console.error("Registration failed", error.response.data)
-                alert("Registration failed")
+
+        userHttp.post('auth/client-register', rest).then((res) => {
+
+            toast.success("Registration successful", {
+                description: "Please verify your email to login"
             })
-        }
-        catch (error) {
-            console.error("Registration failed", error)
-            alert("Registration failed")
-        }
+            navigate("/client")
+
+        }).catch((error) => {
+            toast.error("Registration Failed", {
+                description: error.response.data.message
+            })
+        })
     }
     const password = watch("password");
     const confirmPassword = watch("confirmPassword");

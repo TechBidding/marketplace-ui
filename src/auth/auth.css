@@ -37,12 +37,12 @@
 
 
 /* Light Theme */
-.light .auth-content {
+html.light .auth-content {
     --auth-bg: white;
 }
 
 /* Dark Theme */
-.dark .auth-content {
+html.dark .auth-content {
     --auth-bg: black;
 }
 
@@ -54,13 +54,13 @@
 .auth-header h1 {
     font-size: 2rem;
     font-weight: bold;
-    color: #2d3748;
+    color: var(--header-bg);
     margin-bottom: 0.1rem;
 }
 
 .auth-header p {
     font-size: 1rem;
-    color: #718096;
+    color: var(--header-bg);
 }
 
 .registration-form {
@@ -86,7 +86,7 @@
 
 .input-group label {
     font-size: 0.9rem;
-    color: #4a5568;
+    color: var(--header-bg);
     font-weight: 500;
     text-align: left;
     /* Aligns the label to the left */
@@ -112,17 +112,49 @@
 
 .input-group input {
     padding: 0.75rem;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border-color);
     border-radius: 4px;
     font-size: 1rem;
-    color: #000;
-    transition: border-color 0.3s ease;
+    color: var(--text-color);
+    background-color: var(--input-bg);
+    transition: all 0.3s ease;
 }
 
 .input-group input:focus {
     outline: none;
-    border-color: #4a90e2;
-    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+    border-color: var(--focus-color);
+    box-shadow: 0 0 0 2px var(--focus-shadow);
+}
+
+/* Light theme variables */
+html.light {
+    --border-color: #e2e8f0;
+    --text-color: #2d3748;
+    --input-bg: #ffffff;
+    --focus-color: #4a90e2;
+    --focus-shadow: rgba(74, 144, 226, 0.2);
+}
+
+/* Dark theme variables */
+html.dark {
+    --border-color: #4a5568;
+    --text-color: #edf2f7;
+    --input-bg: #2d3748;
+    --focus-color: #63b3ed;
+    --focus-shadow: rgba(99, 179, 237, 0.2);
+    --header-bg: #eef0f4;
+}
+
+/* Add hover state */
+.input-group input:hover {
+    border-color: var(--focus-color);
+}
+
+/* Add disabled state */
+.input-group input:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    background-color: var(--border-color);
 }
 
 .submit-button {
@@ -149,11 +181,11 @@
 
 .form-footer p {
     font-size: 0.9rem;
-    color: #718096;
+    color: var(--header-bg);
 }
 
 .form-footer a {
-    color: #6b46c1;
+    color: #6f4ac7;
     text-decoration: none;
     font-weight: 500;
 }

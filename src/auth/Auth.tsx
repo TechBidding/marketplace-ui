@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode} from 'react';
 import './Auth.css';
 
 interface AuthProps {
@@ -6,11 +6,7 @@ interface AuthProps {
 }
 
 export const Auth = ({ children }: AuthProps) => {
-    const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
 
-    useEffect(() => {
-        document.documentElement.className = theme;
-    }, [theme]);
     return (
         <>
             <div className="auth-container">

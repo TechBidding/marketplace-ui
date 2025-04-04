@@ -10,9 +10,30 @@ import { useSelector } from 'react-redux'
 import { Toaster } from 'sonner'
 import { DevHome } from './pages/DevHome'
 import { ClientHome } from './pages/ClientHome'
+import { useEffect, useState } from 'react'
+import { useAppDispatch } from './store/Store'
+import { fetchUserType } from './store/AuthSlice'
+
+enum UserTypes {
+  developer = "developer",
+  client = "client"
+}
 
 function App() {
   const isLoggedIn = useSelector((state: any) => state.auth.isLoggedIn);
+  const user_type = useSelector((state: any) => state.auth.userType);
+  const userDetails = useSelector((state: any) => state.auth.userDetails);
+  const [theme, setTheme] = useState(localStorage.getItem("vite-ui-theme") || "light");
+
+  useEffect(() => {
+    document.documentElement.className = theme;
+  }, [theme]);
+  const dispatch = useAppDispatch();
+  useEffect(() => {
+    if (isLoggedIn) {
+      dispatch(fetchUserType());
+    }
+  }, [isLoggedIn, dispatch])
 
   return (
     <>
@@ -43,19 +64,26 @@ function App() {
               } />
             </>
           ) : (
-            <>
-              <Route path="/client" element={
-                <ClientHome />
-              } />
-              <Route path="/dev" element={
-                <DevHome />
-              } />
-            </>
+              <>
+                {user_type === UserTypes.developer && (
+                  <>
+                    <Route path="/dev" element={<DevHome />} />
+                  </>
+                )}
+                {user_type === UserTypes.client && (
+                  <>
+                    <Route path="/client" element={<ClientHome />} />
+                  </>
+                )}
+              </>
           )
           }
 
-
-          {/* <Route path="*" element={<NotFound />} /> Handles unknown routes */}
+          <Route path="*" element={
+            <div className="flex items-center justify-center h-screen">
+              <h1 className="text-2xl font-bold">404 - Page Not Found</h1>
+            </div>
+          } />
         </Routes>
       </ThemeProvider>
     </>
