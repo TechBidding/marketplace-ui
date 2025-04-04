@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { userHttp } from '@/utility/api'
 import { useNavigate } from "react-router-dom"
+import { toast } from "sonner"
 
 
 
@@ -28,25 +29,23 @@ export const DevRegister = () => {
     const onSubmit: SubmitHandler<IDevRegisterInput> = (data) => {
         console.log("data", data)
         if (data.password !== data.confirmPassword) {
-            alert("Passwords do not match");
+            toast.error("Passwords do not match")
             return;
         }
 
         const { confirmPassword, ...rest } = data;
-        try {
-            userHttp.post('auth/developer-register', rest).then((res) => {
-                console.log("res", res)
-                    alert("Registration successful")
-                    navigate("/dev")
-            }).catch((error) => {
-                console.error("Registration failed", error.response.data)
-                alert("Registration failed")
+
+        userHttp.post('auth/developer-register', rest).then((res) => {
+            toast.success("Registration successful", {
+                description: "Please verify your email to login"
             })
-        }
-        catch (error) {
-            console.error("Registration failed", error)
-            alert("Registration failed")
-        }
+            navigate("/dev")
+        }).catch((error) => {
+            console.error("Registration failed", error.response.data)
+            toast.error("Registration Failed", {
+                description: error.response.data.message
+            })
+        })
     }
     const password = watch("password");
     const confirmPassword = watch("confirmPassword");

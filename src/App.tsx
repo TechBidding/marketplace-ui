@@ -10,7 +10,6 @@ import { useSelector } from 'react-redux'
 import { Toaster } from 'sonner'
 import { DevHome } from './pages/DevHome'
 import { ClientHome } from './pages/ClientHome'
-import { ModeToggle } from './components/mode-toggle'
 
 function App() {
   const isLoggedIn = useSelector((state: any) => state.auth.isLoggedIn);
