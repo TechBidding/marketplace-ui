@@ -1,5 +1,5 @@
 import { ReactNode} from 'react';
-import './Auth.css';
+import './auth.css';
 
 interface AuthProps {
     children: ReactNode;
