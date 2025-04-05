@@ -3,13 +3,3 @@
     min-height: 100vh;
     width: 100%;
 }
-
-/* .main-content {
-    flex: 1;
-    transition: margin-left 0.3s ease;
-} */
-
-/* Adjust main content when sidebar is collapsed */
-/* .sidebar.collapsed~.main-content {
-    margin-left: 60px;
-} */

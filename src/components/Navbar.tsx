@@ -1,18 +1,46 @@
 import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { NavBarList } from "@/utility/contants";
 import { TbLayoutSidebarLeftExpandFilled } from "react-icons/tb";
 import { TbLayoutSidebarRightExpandFilled } from "react-icons/tb";
 import { ModeToggle } from "./mode-toggle";
 import { useTheme } from "./theme-provider";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { userHttp } from "@/utility/api";
+import { logout } from "@/store/AuthSlice";
+import { toast } from "sonner";
+
 
 
 
 export const Navbar = () => {
     const [expanded, setExpanded] = useState<boolean>(false);
     const userDetails = useSelector((state: any) => state.auth.userDetails);
+    const dispatch = useDispatch();
     const { theme } = useTheme();
+
+    console.log("Window location", window.location);
+
+    const handleLogout = () => {
+        userHttp.post('developer/logout').then(() => {
+                dispatch(logout())
+                window.location.href = `${window.location.pathname}/signin`;
+                toast.success('Logged out successfully');
+        }).catch((err) => {
+            console.log(err);
+            toast.error('Error occurred while logging out', {
+                description: err.response.data.message,
+            });
+        })
+    };
     
 
     return (
@@ -77,10 +105,10 @@ export const Navbar = () => {
                 
                 {/* Toggle */}
                 <div className={`mt-auto pb-4 mr-0.7 flex items-center ${expanded ? 'flex-row justify-end ' : 'flex-col'} gap-2`}>
-                    <div className={`flex items-center ${expanded ? 'mr-auto' : 'justify-center'} ${theme === 'dark' ? 'text-white' : 'background-gray-800'}`}>
+                    <div className={`flex items-center ${expanded ? 'mr-auto' : 'justify-center'} ${theme === 'dark' ? 'text-white' : 'background-gray-800'} cursor-pointer`}>
                         <ModeToggle />
                     </div>
-                    <button onClick={() => setExpanded(!expanded)} className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-700 hover:bg-gray-600 transition duration-300">
+                    <button onClick={() => setExpanded(!expanded)} className={`flex items-center justify-center w-10 h-10 rounded-full transition duration-300 ${theme === 'light' ? "bg-gray-300" : "bg-gray-700"} cursor-pointer `}>
                         {expanded ? (
                             <TbLayoutSidebarRightExpandFilled className="w-5 h-5" />
                         ) : (
@@ -90,26 +118,37 @@ export const Navbar = () => {
                 </div>
 
                 {/* Bottom section */}
-                <div className="mt-auto pt-4  border-t-2 border-gray-400 flex items-center flex-row gap-5">
-                    <div className="mr-2">
-                        <Avatar>
-                            <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-                            <AvatarFallback>CN</AvatarFallback>
-                        </Avatar>
-                    </div>
-                    {
-                        expanded && (
-                            <div className="flex flex-col ">
-                                <div>
-                                    <span className="text-white">{userDetails?.userName}</span>
-                                </div>
-                                <div>
-                                    <span className="text-gray-400">{userDetails?.name}</span>
-                                </div>
+                <div>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger className="mt-auto pt-4  border-t-2 border-gray-400 flex items-center flex-row gap-4 cursor-pointer">
+                            <div className="mr-2">
+                                <Avatar>
+                                    <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+                                    <AvatarFallback>CN</AvatarFallback>
+                                </Avatar>
                             </div>
-                        )
-                    }
+                            {
+                                expanded && (
+                                    <div className="flex flex-col ">
+                                        <div>
+                                            <span className="text-s font-bold">{userDetails?.userName}</span>
+                                        </div>
+                                        <div>
+                                            <span className={`text-s ${theme==='light' ? 'text-gray-700': 'text-gray-400'}`}>{userDetails?.name}</span>
+                                        </div>
+                                    </div>
+                                )
+                            }
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem className="cursor-pointer" >Profile</DropdownMenuItem>
+                            <DropdownMenuItem className="cursor-pointer" onClick={handleLogout}>Logout</DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
+
             </nav>
         </>
     )
