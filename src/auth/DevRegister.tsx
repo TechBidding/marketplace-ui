@@ -36,7 +36,7 @@ export const DevRegister = () => {
 
         const { confirmPassword, ...rest } = data;
         setIsLoading(true)
-        userHttp.post('auth/developer-register', rest).then((res) => {
+        userHttp.post('auth/developer-register', rest).then(() => {
             setIsLoading(false)
             toast.success("Registration successful", {
                 description: "Please verify your email to login"

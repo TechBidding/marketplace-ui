@@ -35,7 +35,7 @@ export const ClientRegister = () => {
 
         const { confirmPassword, ...rest } = data;
 
-        userHttp.post('auth/client-register', rest).then((res) => {
+        userHttp.post('auth/client-register', rest).then(() => {
 
             toast.success("Registration successful", {
                 description: "Please verify your email to login"

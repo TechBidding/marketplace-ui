@@ -1,4 +1,4 @@
-import { useForm, SubmitHandler, set } from "react-hook-form"
+import { useForm, SubmitHandler } from "react-hook-form"
 import './auth.css'
 import { z } from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -28,7 +28,7 @@ export const DevLogin = () => {
 
   const onSubmit: SubmitHandler<IDevLoginInput> = (data) => {
       setIsLoading(true)
-    userHttp.post('auth/developer-login', data).then((res) => {
+    userHttp.post('auth/developer-login', data).then(() => {
         setIsLoading(false)
         dispatch(login())
         toast.success("Login successful")

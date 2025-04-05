@@ -10,11 +10,11 @@ import { useSelector } from 'react-redux'
 import { Toaster } from 'sonner'
 import { DevHome } from './pages/DevHome'
 import { ClientHome } from './pages/ClientHome'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useAppDispatch } from './store/Store'
 import { fetchUserType } from './store/AuthSlice'
-import { Layout } from './components/layout'
 import { useTheme } from 'next-themes'
+import Layout from './layout/Layout'
 
 enum UserTypes {
   developer = "developer",
@@ -24,7 +24,7 @@ enum UserTypes {
 function App() {
   const isLoggedIn = useSelector((state: any) => state.auth.isLoggedIn);
   const user_type = useSelector((state: any) => state.auth.userType);
-  const userDetails = useSelector((state: any) => state.auth.userDetails);
+  // const userDetails = useSelector((state: any) => state.auth.userDetails);
   const { theme } = useTheme();
 
   useEffect(() => {

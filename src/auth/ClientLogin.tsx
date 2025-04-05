@@ -26,7 +26,7 @@ export const ClientLogin = () => {
 
 
   const onSubmit: SubmitHandler<IClientLoginInput> = (data) => {
-      userHttp.post('auth/client-login', data).then((res) => {
+      userHttp.post('auth/client-login', data).then(() => {
         dispatch(login())
         toast.success("Login successful")
         navigate("/client")
