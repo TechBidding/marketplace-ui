@@ -13,6 +13,8 @@ import { ClientHome } from './pages/ClientHome'
 import { useEffect, useState } from 'react'
 import { useAppDispatch } from './store/Store'
 import { fetchUserType } from './store/AuthSlice'
+import { Layout } from './components/layout'
+import { useTheme } from 'next-themes'
 
 enum UserTypes {
   developer = "developer",
@@ -23,11 +25,14 @@ function App() {
   const isLoggedIn = useSelector((state: any) => state.auth.isLoggedIn);
   const user_type = useSelector((state: any) => state.auth.userType);
   const userDetails = useSelector((state: any) => state.auth.userDetails);
-  const [theme, setTheme] = useState(localStorage.getItem("vite-ui-theme") || "light");
+  const { theme } = useTheme();
 
   useEffect(() => {
-    document.documentElement.className = theme;
+    if (theme) {
+      document.documentElement.className = theme;
+    }
   }, [theme]);
+  
   const dispatch = useAppDispatch();
   useEffect(() => {
     if (isLoggedIn) {
@@ -67,12 +72,20 @@ function App() {
               <>
                 {user_type === UserTypes.developer && (
                   <>
-                    <Route path="/dev" element={<DevHome />} />
+                    <Route path="/dev" element={
+                      <Layout>
+                        <DevHome />
+                      </Layout>
+                    } />
                   </>
                 )}
                 {user_type === UserTypes.client && (
                   <>
-                    <Route path="/client" element={<ClientHome />} />
+                    <Route path="/client" element={
+                      <Layout>
+                        <ClientHome />
+                      </Layout>
+                    } />
                   </>
                 )}
               </>
