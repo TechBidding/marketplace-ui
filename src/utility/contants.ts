@@ -5,16 +5,16 @@ export const NavBarList = [
         {
             name: "Settings",
             icon: LuSettings2,
-            link: "/settings"
+            link: "settings"
         },
         {
             name: "Profile",
             icon: LuSettings2 ,
-            link: "/profile"
+            link: "profile"
         },
         {
-            name: "Logout",
+            name: "Services",
             icon: LuSettings2,
-            link: "/logout"
+            link: "services"
         }
     ]

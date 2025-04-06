@@ -3,7 +3,7 @@ import './auth.css'
 import { z } from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { userHttp } from '@/utility/api'
-import { useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { login } from "@/store/AuthSlice"
 import { useDispatch } from "react-redux"
 import { toast } from "sonner"
@@ -69,7 +69,7 @@ export const ClientLogin = () => {
           <button type="submit" className="submit-button">Sign In</button>
         </div>
         <div className="form-footer">
-          <p>Don't have an account? <a href="/client/signup">Sign up</a></p>
+          <p>Don't have an account? <Link to="/client/signup">Sign up</Link></p>
         </div>
       </form>
     </div>

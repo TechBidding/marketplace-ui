@@ -1,5 +1,5 @@
 import './App.css'
-import { Route, Routes } from 'react-router-dom'
+import { Route, Routes, useLocation } from 'react-router-dom'
 import { ClientLogin } from './auth/ClientLogin'
 import { ThemeProvider } from './components/theme-provider'
 import { Auth } from './auth/Auth'
@@ -10,7 +10,7 @@ import { useSelector } from 'react-redux'
 import { Toaster } from 'sonner'
 import { DevHome } from './pages/DevHome'
 import { ClientHome } from './pages/ClientHome'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useAppDispatch } from './store/Store'
 import { fetchUserType } from './store/AuthSlice'
 import { useTheme } from 'next-themes'
@@ -24,21 +24,31 @@ enum UserTypes {
 function App() {
   const isLoggedIn = useSelector((state: any) => state.auth.isLoggedIn);
   const user_type = useSelector((state: any) => state.auth.userType);
-  // const userDetails = useSelector((state: any) => state.auth.userDetails);
+  const location = useLocation();
   const { theme } = useTheme();
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     if (theme) {
       document.documentElement.className = theme;
     }
   }, [theme]);
-  
-  const dispatch = useAppDispatch();
+
   useEffect(() => {
-    if (isLoggedIn) {
+    dispatch(fetchUserType());
+  }, [isLoggedIn])
+
+  useEffect(() => {
+    if (!isLoggedIn || !user_type) return;
+
+    if ((user_type === UserTypes.developer && location.pathname.startsWith('/dev')) || (user_type === UserTypes.client && location.pathname.startsWith('/client'))) {
+      return;
+    }
+    else {
       dispatch(fetchUserType());
     }
-  }, [isLoggedIn, dispatch])
+
+  }, [location.pathname, user_type, isLoggedIn, dispatch]);
 
   return (
     <>
@@ -69,26 +79,26 @@ function App() {
               } />
             </>
           ) : (
-              <>
-                {user_type === UserTypes.developer && (
-                  <>
-                    <Route path="/dev" element={
-                      <Layout>
-                        <DevHome />
-                      </Layout>
-                    } />
-                  </>
-                )}
-                {user_type === UserTypes.client && (
-                  <>
-                    <Route path="/client" element={
-                      <Layout>
-                        <ClientHome />
-                      </Layout>
-                    } />
-                  </>
-                )}
-              </>
+            <>
+              {user_type === UserTypes.developer && (
+                <>
+                  <Route path="/dev" element={
+                    <Layout>
+                      <DevHome />
+                    </Layout>
+                  } />
+                </>
+              )}
+              {user_type === UserTypes.client && (
+                <>
+                  <Route path="/client" element={
+                    <Layout>
+                      <ClientHome />
+                    </Layout>
+                  } />
+                </>
+              )}
+            </>
           )
           }
 

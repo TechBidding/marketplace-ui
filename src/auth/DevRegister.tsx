@@ -3,7 +3,7 @@ import './auth.css'
 import { z } from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { userHttp } from '@/utility/api'
-import { useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { toast } from "sonner"
 import { useState } from "react"
 import debounce from "@/utility/debounce"
@@ -149,7 +149,7 @@ export const DevRegister = () => {
                     <button type="submit" className="submit-button" disabled={isLoading}>Register</button>
                 </div>
                 <div className="form-footer">
-                    <p>Already have an account? <a href="/dev/signin">Sign in</a></p>
+                    <p>Already have an account? <Link to="/dev/signin">Sign in</Link></p>
                 </div>
             </form>
         </div>

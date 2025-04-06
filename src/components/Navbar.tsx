@@ -17,6 +17,7 @@ import {
 import { userHttp } from "@/utility/api";
 import { logout } from "@/store/AuthSlice";
 import { toast } from "sonner";
+import { Link, useNavigate } from "react-router-dom";
 
 
 
@@ -26,6 +27,7 @@ export const Navbar = () => {
     const userDetails = useSelector((state: any) => state.auth.userDetails);
     const dispatch = useDispatch();
     const { theme } = useTheme();
+    const navigate = useNavigate()
 
     const handleLogout = () => {
         userHttp.post('developer/logout').then(() => {
@@ -38,6 +40,10 @@ export const Navbar = () => {
             });
         })
     };
+
+    const handleProfile = () => {
+        navigate(`/dev/profile`)
+    }
     
 
     return (
@@ -77,7 +83,7 @@ export const Navbar = () => {
                         <ul className="flex flex-col space-y-4 mt-20 gap-5">
                             {NavBarList.map((item, index) => (
                                 <li key={index}>
-                                    <a href={item.link} className="hover:text-gray-400">
+                                    <Link to={item.link} className="hover:text-gray-400">
                                         {expanded ? (
                                             <div className="flex items-center justify-between w-full">
                                                 <div className="flex justify-center items-center gap-2">
@@ -90,7 +96,7 @@ export const Navbar = () => {
                                                 <item.icon className="w-5 h-5" />
                                             </div>
                                         )}
-                                    </a>
+                                    </Link>
                                 </li>
                             ))}
                         </ul>
@@ -140,7 +146,7 @@ export const Navbar = () => {
                         <DropdownMenuContent>
                             <DropdownMenuLabel>My Account</DropdownMenuLabel>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem className="cursor-pointer" >Profile</DropdownMenuItem>
+                            <DropdownMenuItem className="cursor-pointer" onClick={handleProfile} >Profile</DropdownMenuItem>
                             <DropdownMenuItem className="cursor-pointer" onClick={handleLogout}>Logout</DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
