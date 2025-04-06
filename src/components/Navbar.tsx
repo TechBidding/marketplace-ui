@@ -27,15 +27,12 @@ export const Navbar = () => {
     const dispatch = useDispatch();
     const { theme } = useTheme();
 
-    console.log("Window location", window.location);
-
     const handleLogout = () => {
         userHttp.post('developer/logout').then(() => {
                 dispatch(logout())
                 window.location.href = `${window.location.pathname}/signin`;
                 toast.success('Logged out successfully');
         }).catch((err) => {
-            console.log(err);
             toast.error('Error occurred while logging out', {
                 description: err.response.data.message,
             });

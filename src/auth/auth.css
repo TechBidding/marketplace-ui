@@ -193,3 +193,17 @@ html.dark {
 .form-footer a:hover {
     text-decoration: underline;
 }
+
+.validation-message {
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    margin-right: auto;
+}
+
+.validation-message.success {
+    color: #10b981;
+}
+
+.validation-message.error {
+    color: #ef4444;
+}

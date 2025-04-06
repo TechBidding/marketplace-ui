@@ -1,4 +1,4 @@
-import { useForm, SubmitHandler } from "react-hook-form"
+import { useForm, SubmitHandler, set } from "react-hook-form"
 import './auth.css'
 import { z } from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -6,6 +6,7 @@ import { userHttp } from '@/utility/api'
 import { useNavigate } from "react-router-dom"
 import { toast } from "sonner"
 import { useState } from "react"
+import debounce from "@/utility/debounce"
 
 
 
@@ -27,8 +28,18 @@ export const DevRegister = () => {
         resolver: zodResolver(devRegisterSchema)
     })
     const [isLoading, setIsLoading] = useState(false)
+    const [usernameStatus, setUsernameStatus] = useState<{
+        message: string;
+        type: 'success' | 'error' | null;
+    }>({ message: '', type: null });
     const navigate = useNavigate()
     const onSubmit: SubmitHandler<IDevRegisterInput> = (data) => {
+
+        if (!data) {
+            toast.error("Please fill all the fields")
+            return;
+        }
+
         if (data.password !== data.confirmPassword) {
             toast.error("Passwords do not match")
             return;
@@ -52,6 +63,24 @@ export const DevRegister = () => {
     }
     const password = watch("password");
     const confirmPassword = watch("confirmPassword");
+
+    const checkUserName = debounce((userName: string) => {
+        if (userName.length < 1) return;
+
+        userHttp.post('auth/check-username', { userName })
+            .then(() => {
+                setUsernameStatus({
+                    message: 'Username is available',
+                    type: 'success'
+                });
+            })
+            .catch((error) => {
+                setUsernameStatus({
+                    message: error.response.data.message || 'Username is already taken',
+                    type: 'error'
+                });
+            });
+    }, 900);
 
 
     return (
@@ -79,9 +108,17 @@ export const DevRegister = () => {
                     </div>
                     <div className="input-group">
                         <label>Username</label>
-                        <input {...register("userName", { required: true })} placeholder="Enter unique username" disabled={isLoading} />
+                        <input {...register("userName", { required: true })} placeholder="Enter unique username" disabled={isLoading} onChange={(e)=>checkUserName(e.target.value)} />
                         {errors.userName && (
                             <p className="error-message" role="alert">{errors.userName.message}</p>
+                        )}
+                        {usernameStatus.type && (
+                            <p
+                                className={`validation-message ${usernameStatus.type}`}
+                                role="alert"
+                            >
+                                {usernameStatus.message}
+                            </p>
                         )}
                     </div>
                     <div className="input-group">
