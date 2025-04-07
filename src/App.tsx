@@ -1,5 +1,5 @@
 import './App.css'
-import { Route, Routes, useLocation } from 'react-router-dom'
+import { Link, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { ClientLogin } from './auth/ClientLogin'
 import { ThemeProvider } from './components/theme-provider'
 import { Auth } from './auth/Auth'
@@ -87,6 +87,9 @@ function App() {
                       <DevHome />
                     </Layout>
                   } />
+                    
+                    <Route path="/dev/signin" element={<Navigate to="/dev" replace />} />
+                    <Route path="/dev/signup" element={<Navigate to="/dev" replace />} />
                 </>
               )}
               {user_type === UserTypes.client && (
@@ -96,6 +99,9 @@ function App() {
                       <ClientHome />
                     </Layout>
                   } />
+                    
+                    <Route path="/client/signin" element={<Navigate to="/client" replace />} />
+                    <Route path="/client/signup" element={<Navigate to="/client" replace />} />
                 </>
               )}
             </>
