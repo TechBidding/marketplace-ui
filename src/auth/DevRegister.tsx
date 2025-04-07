@@ -1,4 +1,4 @@
-import { useForm, SubmitHandler, set } from "react-hook-form"
+import { useForm, SubmitHandler} from "react-hook-form"
 import './auth.css'
 import { z } from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod"
