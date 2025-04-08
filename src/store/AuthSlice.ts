@@ -16,7 +16,7 @@ export interface AuthStateState {
     userDetails: UserDetailType | null
 }
 
-const initialState: AuthStateState = { 
+const initialState: AuthStateState = {
     isLoggedIn: JSON.parse(localStorage.getItem('isLoggedIn') || 'false'),
     userType: null,
     userDetails: null
@@ -36,10 +36,17 @@ const getCookie = (name: string) => {
 
 export const fetchUserType = createAsyncThunk("auth/decode-token", async () => {
     const myCookie = getCookie("access_token");
-    const response = await userHttp.post('auth/decode-token', {
+
+    try {
+        const response = await userHttp.post('auth/decode-token', {
             token: myCookie
-    })
-    return response.data;
+        })
+        return response.data;
+    }
+    catch (error) {
+        console.error("Error fetching user type:", error);
+        throw error;
+    }
 });
 
 const authSlice = createSlice({
@@ -59,8 +66,15 @@ const authSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder.addCase(fetchUserType.fulfilled, (state, action) => {
+            console.log("Hello")
             state.userType = action.payload.userType;
             state.userDetails = action.payload.user;
+        });
+        builder.addCase(fetchUserType.rejected, (state) => {
+            localStorage.removeItem('isLoggedIn');
+            state.userType = null;
+            state.userDetails = null;
+            state.isLoggedIn = false;
         });
     },
 })

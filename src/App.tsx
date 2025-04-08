@@ -15,6 +15,7 @@ import { useAppDispatch } from './store/Store'
 import { fetchUserType } from './store/AuthSlice'
 import { useTheme } from 'next-themes'
 import Layout from './layout/Layout'
+import { Home } from './pages/Home'
 
 enum UserTypes {
   developer = "developer",
@@ -57,6 +58,9 @@ function App() {
         <Routes>
           {!isLoggedIn ? (
             <>
+              <Route path="/" element={
+                <Home />
+              } />
               <Route path="/client/signup" element={
                 <Auth>
                   <ClientRegister />
@@ -77,6 +81,7 @@ function App() {
                   <DevLogin />
                 </Auth>
               } />
+              <Route path="*" element={<Navigate to="/" replace />} />
             </>
           ) : (
             <>
