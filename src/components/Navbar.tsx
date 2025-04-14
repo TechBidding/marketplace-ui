@@ -61,6 +61,7 @@ export const Navbar = () => {
                     transitionTimingFunction: 'ease-in-out',
                     transitionProperty: 'width, padding, background-color',
                     transitionDelay: '0s',
+                    zIndex: 1,
                 }}>
                 
                 {/* Logo */}

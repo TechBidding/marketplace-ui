@@ -10,7 +10,7 @@ export const ServiceCard = ({ service, onEdit, onDelete }: {
         <div className={`
             relative
             flex flex-col md:flex-row
-            w-full lg:w-[32%] h-[700px] md:h-[400px]
+            w-full lg:w-[32.5%] h-[700px] md:h-[400px]
             p-4 gap-6
             rounded-xl
             transition-all duration-300 ease-in-out
@@ -19,7 +19,7 @@ export const ServiceCard = ({ service, onEdit, onDelete }: {
                 ? 'bg-green-950/90 hover:bg-green-950'
                 : 'bg-white hover:bg-white'}
         `}>
-            {/* Operations Menu */}
+            
 
 
             {/* Left Section - Image and Basic Info */}
@@ -131,7 +131,7 @@ export const ServiceCard = ({ service, onEdit, onDelete }: {
                         Related Projects
                     </h3>
                     <div className="flex flex-wrap gap-3">
-                        {service.projectIds.map((project: any, index: number) => (
+                        {service.projectIds && service.projectIds.map((project: any, index: number) => (
                             <div
                                 key={index}
                                 className={`
