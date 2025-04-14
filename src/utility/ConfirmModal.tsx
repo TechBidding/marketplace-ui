@@ -24,14 +24,14 @@ export const ConfirmModal = ({ title, message, onConfirm, onCancel }: ConfirmMod
                 <div className="flex justify-center gap-3 mt-6">
                     <button
                         className={`${theme === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'
-                            } text-white py-2 px-4 rounded-lg text-sm md:text-base transition-colors`}
+                            } text-white py-2 px-4 rounded-lg text-sm cursor-pointer md:text-base transition-colors`}
                         onClick={onConfirm}
                     >
                         Yes
                     </button>
                     <button
                         className={`${theme === 'dark' ? 'bg-red-600 hover:bg-red-700' : 'bg-red-500 hover:bg-red-600'
-                            } text-white py-2 px-4 rounded-lg text-sm md:text-base transition-colors`}
+                            } text-white py-2 px-4 rounded-lg text-sm cursor-pointer md:text-base transition-colors`}
                         onClick={onCancel}
                     >
                         No

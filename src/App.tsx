@@ -17,6 +17,7 @@ import { useTheme } from 'next-themes'
 import Layout from './layout/Layout'
 import { Home } from './pages/Home'
 import { Services } from './pages/Services'
+import { Profile } from './pages/Profile'
 
 enum UserTypes {
   developer = "developer",
@@ -119,6 +120,11 @@ function App() {
             </>
           )
           }
+          <Route path="/:username" element={
+            <Layout>
+              <Profile />
+            </Layout>
+          } />
 
           <Route path="*" element={
             <div className="flex items-center justify-center h-screen">

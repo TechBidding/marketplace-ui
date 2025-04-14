@@ -42,7 +42,8 @@ export const Navbar = () => {
     };
 
     const handleProfile = () => {
-        navigate(`/dev/profile`)
+
+        navigate(`/${userDetails.userName}`)
     }
     
 
