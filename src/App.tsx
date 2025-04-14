@@ -16,6 +16,7 @@ import { fetchUserType } from './store/AuthSlice'
 import { useTheme } from 'next-themes'
 import Layout from './layout/Layout'
 import { Home } from './pages/Home'
+import { Services } from './pages/Services'
 
 enum UserTypes {
   developer = "developer",
@@ -92,6 +93,12 @@ function App() {
                       <DevHome />
                     </Layout>
                   } />
+                    
+                    <Route path="/dev/services" element={
+                      <Layout>
+                        <Services />
+                      </Layout>
+                    } />
                     
                     <Route path="/dev/signin" element={<Navigate to="/dev" replace />} />
                     <Route path="/dev/signup" element={<Navigate to="/dev" replace />} />
