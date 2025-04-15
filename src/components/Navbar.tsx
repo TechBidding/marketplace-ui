@@ -28,7 +28,6 @@ export const Navbar = () => {
     const dispatch = useDispatch();
     const { theme } = useTheme();
     const navigate = useNavigate()
-    console.log("Navabar theme: ", theme);
     const handleLogout = () => {
         userHttp.post('developer/logout').then(() => {
                 dispatch(logout())
