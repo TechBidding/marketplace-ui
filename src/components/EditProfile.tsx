@@ -28,11 +28,8 @@ export const EditProfile = ({ isProfileEditing, setIsProfileEditing, userData }:
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
     const onSubmit = (data: any) => {
-        console.log("Form submitted: ", data)
         delete data.email;
-
-        setIsModalOpen(true);
-
+        //TODO: add email to the data object
         userHttp.put('developer', JSON.stringify(data))
             .then((res) => {
                 console.log("Profile updated successfully: ", res.data)
@@ -53,7 +50,7 @@ export const EditProfile = ({ isProfileEditing, setIsProfileEditing, userData }:
             ${theme === "dark" ? 'bg-green-950/90' : 'bg-gray-100'}
             mt-4
         `}>
-            <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+            <form className="space-y-6">
                 <div className="space-y-4">
                     <div className="space-y-2 text-left">
                         <label
@@ -141,7 +138,7 @@ export const EditProfile = ({ isProfileEditing, setIsProfileEditing, userData }:
                         Cancel
                     </button>
                     <button
-                        type="submit"
+                        type="button"
                         className={`
                             px-2 py-1 rounded-lg font-medium cursor-pointer
                             transition duration-200
@@ -149,22 +146,26 @@ export const EditProfile = ({ isProfileEditing, setIsProfileEditing, userData }:
                                 ? 'bg-green-700 hover:bg-green-600 text-white'
                                 : 'bg-amber-500 hover:bg-amber-600 text-white'}
                         `}
+                        onClick={() => {
+                            setIsModalOpen(true)
+                        }
+                        }
                     >
                         Save Changes
                     </button>
                 </div>
+                {isModalOpen && (
+                    <ConfirmModal
+                        title="Confirm Changes"
+                        message="Are you sure you want to save these changes?"
+                        onConfirm={handleSubmit(onSubmit)}
+                        onCancel={() => {
+                            setIsModalOpen(false)
+                            setIsProfileEditing(false)
+                        }}
+                    />
+                )}
             </form>
-            {isModalOpen && (
-                <ConfirmModal
-                    title="Confirm Changes"
-                    message="Are you sure you want to save these changes?"
-                    onConfirm={handleSubmit(onSubmit)}
-                    onCancel={() => {
-                        setIsModalOpen(false)
-                        setIsProfileEditing(false)
-                    }}
-                />
-            )}
         </div>
     )
 }
