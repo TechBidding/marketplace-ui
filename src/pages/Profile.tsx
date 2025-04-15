@@ -1,13 +1,14 @@
+import { ProfileTabs } from '@/components/profile/ProfileTabs'
 import { UserInfo } from '@/components/UserInfo'
-import React from 'react'
-
-//TODO: I have to 
 
 export const Profile = () => {
   return (
-    <div>
-      <div className='h-screen w-[30%]'>
-      <UserInfo />
+    <div className='flex flex-col md:flex-row'>
+      <div className='w-full md:h-screen md:w-[30%] '>
+        <UserInfo />
+      </div>
+      <div className='w-full md:h-screen md:w-[70%]'>
+        <ProfileTabs />
       </div>
     </div>
   )
