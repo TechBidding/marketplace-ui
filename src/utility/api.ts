@@ -4,9 +4,9 @@ import axios from 'axios';
 export const http = (baseURL:string) => axios.create({
     baseURL,
     timeout: 10000,
-    headers: {
-        "Content-Type": "application/json",
-    },
+    // headers: {
+    //     "Content-Type": "application/json",
+    // },
     withCredentials: true,
 });
 

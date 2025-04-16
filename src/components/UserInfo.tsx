@@ -6,6 +6,7 @@ import { EditProfile } from './EditProfile'
 import { MdOutlineEmail } from "react-icons/md"
 import { FaPhoneAlt } from "react-icons/fa"
 import { useTheme } from './theme-provider'
+import { toast } from 'sonner'
 
 export const UserInfo = () => {
     const { theme } = useTheme()
@@ -19,7 +20,9 @@ export const UserInfo = () => {
         userHttp.get(`developer/${params.username}`).then((res) => {
             setUserData(res.data)
         }).catch((err) => {
-            console.log("Error while fetching user info: ", err)
+            toast.error("Error fetching user data", {
+                description: err.response.data.message
+            });
         })
     }, [isProfileEditing])
 
@@ -33,17 +36,17 @@ export const UserInfo = () => {
         `}>
             <div className="flex flex-col items-center md:items-start">
                 {/* Profile Image */}
-                <div className="group w-32 h-32 md:w-40 md:h-40 rounded-full bg-gray-300 overflow-hidden">
-                    <img
-                        src="https://github.com/shadcn.png"
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                        alt="Profile"
-                    />
-                </div>
 
                 {!isProfileEditing ? (
                     <div className="w-full space-y-6 mt-6">
                         {/* Name and Username */}
+                        <div className="group w-32 h-32 md:w-40 md:h-40 rounded-full bg-gray-300 overflow-hidden">
+                            <img
+                                src={userData?.profilePicture || 'https://github.com/shadcn.png'}
+                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                                alt="Profile"
+                            />
+                        </div>
                         <div className="text-left">
                             <h1 className={`text-2xl font-bold ${theme === "dark" ? 'text-white' : 'text-gray-900'}`}>
                                 {userData?.name}
