@@ -3,7 +3,7 @@ import { useTheme } from "./theme-provider"
 import { userHttp } from "@/utility/api";
 import { toast } from "sonner";
 import { ConfirmModal } from "@/utility/confirmModal";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface EditProfileProps {
     isProfileEditing: boolean;
@@ -18,7 +18,7 @@ interface EditProfileProps {
 
 export const EditProfile = ({ isProfileEditing, setIsProfileEditing, userData }: EditProfileProps) => {
     const { theme } = useTheme();
-    const { register, handleSubmit, formState: { errors } } = useForm({
+    const {watch, register, handleSubmit, formState: { errors } } = useForm({
         defaultValues: {
             name: userData.name,
             email: userData.email,
@@ -31,19 +31,51 @@ export const EditProfile = ({ isProfileEditing, setIsProfileEditing, userData }:
     const [imageFile, setImageFile] = useState<File | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [isUpdating, setIsUpdating] = useState(false);
+    const [hasFieldsChanged, setHasFieldsChanged] = useState(false);
+
+
+    const name = watch("name");
+    const email = watch("email");
+    const phoneNumber = watch("phoneNumber");
+
+
+    const initialDataRef = useRef({
+        name: userData.name,
+        email: userData.email,
+        phoneNumber: userData.phoneNumber,
+        profilePicture: userData?.profilePicture || 'https://github.com/shadcn.png'
+    });
+
+
+    useEffect(() => {
+        const currentDataChanged = (
+            name !== initialDataRef.current.name ||
+            email !== initialDataRef.current.email ||
+            phoneNumber !== initialDataRef.current.phoneNumber ||
+            imagePreview !== initialDataRef.current.profilePicture
+        );
+
+        setHasFieldsChanged(currentDataChanged);
+    }, [name, email, phoneNumber, imagePreview]);
+
 
 
     const onSubmit = (data: any) => {
         delete data.email;
         //TODO: add email to the data object
 
+        //Check for the changed fields
+
+
         const formData = new FormData();
         if (imageFile) {
             formData.append("image", imageFile);
         }
-        formData.append("name", data.name);
-        formData.append("phoneNumber", data.phoneNumber);
-
+        
+        let oldData = initialDataRef.current;
+        oldData.name !== data.name && formData.append("name", data.name);
+        oldData.phoneNumber !== data.phoneNumber && formData.append("phoneNumber", data.phoneNumber);
+        
         setIsUpdating(true);
         setIsModalOpen(false)
         userHttp.put('developer', formData)
@@ -211,9 +243,11 @@ export const EditProfile = ({ isProfileEditing, setIsProfileEditing, userData }:
                     </button>
                     <button
                         type="button"
-                        disabled={isUpdating}
+                        disabled={!hasFieldsChanged}
                         className={`
-                            px-2 py-1 rounded-lg font-medium cursor-pointer
+                            px-2 py-1 rounded-lg font-medium ${!hasFieldsChanged ? 'opacity-50 cursor-not-allowed' : ''}
+                            ${!hasFieldsChanged ? 'cursor-not-allowed' : 'cursor-pointer'}
+                            ${hasFieldsChanged ? 'hover:scale-105' : ''}
                             transition duration-200
                             ${theme === "dark"
                                 ? 'bg-green-700 hover:bg-green-600 text-white'
