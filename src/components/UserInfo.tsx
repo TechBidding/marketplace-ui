@@ -59,7 +59,7 @@ export const UserInfo = () => {
                         {/* Bio */}
                         <div className="text-left">
                             <p className={`${theme === "dark" ? 'text-gray-300' : 'text-gray-600'}`}>
-                                Hello This is me Priyanshu. I am a software engineer @contentstack. and i love what i do.
+                                {userData?.bio}
                             </p>
                         </div>
 

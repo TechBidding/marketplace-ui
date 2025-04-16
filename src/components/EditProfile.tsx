@@ -10,6 +10,7 @@ interface EditProfileProps {
     setIsProfileEditing: (value: boolean) => void;
     userData: {
         name: string;
+        bio?: string
         email: string;
         phoneNumber: string;
         profilePicture?: string;
@@ -21,6 +22,7 @@ export const EditProfile = ({ isProfileEditing, setIsProfileEditing, userData }:
     const {watch, register, handleSubmit, formState: { errors } } = useForm({
         defaultValues: {
             name: userData.name,
+            bio: userData?.bio || '',
             email: userData.email,
             phoneNumber: userData.phoneNumber
         }
@@ -37,13 +39,15 @@ export const EditProfile = ({ isProfileEditing, setIsProfileEditing, userData }:
     const name = watch("name");
     const email = watch("email");
     const phoneNumber = watch("phoneNumber");
+    const bio = watch("bio");
 
 
     const initialDataRef = useRef({
         name: userData.name,
         email: userData.email,
         phoneNumber: userData.phoneNumber,
-        profilePicture: userData?.profilePicture || 'https://github.com/shadcn.png'
+        profilePicture: userData?.profilePicture || 'https://github.com/shadcn.png',
+        bio: userData?.bio || ''
     });
 
 
@@ -52,11 +56,11 @@ export const EditProfile = ({ isProfileEditing, setIsProfileEditing, userData }:
             name !== initialDataRef.current.name ||
             email !== initialDataRef.current.email ||
             phoneNumber !== initialDataRef.current.phoneNumber ||
-            imagePreview !== initialDataRef.current.profilePicture
+            imagePreview !== initialDataRef.current.profilePicture ||
+            bio !== initialDataRef.current.bio
         );
-
         setHasFieldsChanged(currentDataChanged);
-    }, [name, email, phoneNumber, imagePreview]);
+    }, [name, email, phoneNumber, imagePreview, bio]);
 
 
 
@@ -75,6 +79,7 @@ export const EditProfile = ({ isProfileEditing, setIsProfileEditing, userData }:
         let oldData = initialDataRef.current;
         oldData.name !== data.name && formData.append("name", data.name);
         oldData.phoneNumber !== data.phoneNumber && formData.append("phoneNumber", data.phoneNumber);
+        oldData.bio !== data.bio && formData.append("bio", data.bio);
         
         setIsUpdating(true);
         setIsModalOpen(false)
@@ -175,6 +180,28 @@ export const EditProfile = ({ isProfileEditing, setIsProfileEditing, userData }:
                                     : 'bg-white border-gray-200 focus:ring-amber-500 text-gray-900'}
                             `}
                             placeholder="Enter your name"
+                        />
+                    </div>
+
+                    <div className="space-y-2 text-left">
+                        <label
+                            className={`text-sm font-medium
+                                ${theme === "dark" ? 'text-gray-200' : 'text-gray-700'}
+                            `}
+                        >
+                            Bio
+                        </label>
+                        <textarea
+                            {...register("bio")}
+                            className={`
+                                w-full px-4 py-2 rounded-lg h-36
+                                border focus:outline-none focus:ring-2
+                                transition duration-200
+                                ${theme === "dark"
+                                    ? 'bg-green-900/30 border-green-800 focus:ring-green-700 text-gray-200'
+                                    : 'bg-white border-gray-200 focus:ring-amber-500 text-gray-900'}
+                            `}
+                            placeholder="Update your bio"
                         />
                     </div>
 
