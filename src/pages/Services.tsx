@@ -35,8 +35,8 @@ let services = [
             "currency": "USD",
             "amount": 100
         },
-        skills: [{ name: "skill 2", id: 1 }, { name: "skill 1", id: 2 }],
-        projectIds: [{ name: "This si smy project name what about tyou 2", id: 1 }, { name: "this is amy project name 1", id: 2 }, { name: "project 2", id: 1 }, { name: "project 1", id: 2 }, { name: "project 2", id: 1 }, { name: "project 1", id: 2 }, { name: "project 2", id: 1 }, { name: "project 1", id: 2 }, { name: "project 2", id: 1 }, { name: "project 1", id: 2 }, { name: "project 2", id: 1 }, { name: "project 1", id: 2 }, { name: "project 2", id: 1 }, { name: "project 1", id: 2 }],
+        skills: [],
+        projectIds: [],
         imageUrl: "https://github.com/shadcn.png",
         id: 3
     },

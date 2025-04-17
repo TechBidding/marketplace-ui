@@ -83,7 +83,7 @@ function App() {
                   <DevLogin />
                 </Auth>
               } />
-              <Route path="/:username" element={
+              <Route path="/user/:username" element={
                 <Layout>
                   <Profile />
                 </Layout>
@@ -108,7 +108,7 @@ function App() {
                     
                     <Route path="/dev/signin" element={<Navigate to="/dev" replace />} />
                     <Route path="/dev/signup" element={<Navigate to="/dev" replace />} />
-                    <Route path="/:username" element={
+                    <Route path="/user/:username" element={
                       <Layout>
                         <Profile />
                       </Layout>
@@ -125,7 +125,7 @@ function App() {
                     
                     <Route path="/client/signin" element={<Navigate to="/client" replace />} />
                     <Route path="/client/signup" element={<Navigate to="/client" replace />} />
-                    <Route path="/:username" element={
+                    <Route path="/user/:username" element={
                       <Layout>
                         <Profile />
                       </Layout>

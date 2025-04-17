@@ -90,6 +90,18 @@ export const ServiceCard = ({ service, onEdit, onDelete }: {
                         Skills & Expertise
                     </h3>
                     <div className="flex flex-wrap gap-2">
+                        {service.skills && service.skills.length === 0 && (
+                            <div className={`
+                                flex items-center justify-center
+                                w-full h-full
+                                p-4 rounded-lg
+                                ${theme === "dark" ? 'bg-green-900/10' : 'bg-gray-50'}
+                            `}>
+                                <span className="text-sm font-light text-red-400">
+                                    No skills available.
+                                </span>
+                            </div>
+                        )}
                         {service.skills.map((skill: any, index: number) => (
                             <div
                                 key={index}
@@ -131,6 +143,18 @@ export const ServiceCard = ({ service, onEdit, onDelete }: {
                         Related Projects
                     </h3>
                     <div className="flex flex-wrap gap-3">
+                        {service.projectIds && service.projectIds.length === 0 && (
+                            <div className={`
+                                flex items-center justify-center
+                                w-full h-full
+                                p-4 rounded-lg
+                                ${theme === "dark" ? 'bg-green-900/10' : 'bg-gray-50'}
+                            `}>
+                                <span className="text-sm font-light text-red-400">
+                                    No related projects available.
+                                </span>
+                            </div>
+                        )}
                         {service.projectIds && service.projectIds.map((project: any, index: number) => (
                             <div
                                 key={index}
