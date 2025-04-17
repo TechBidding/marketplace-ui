@@ -83,6 +83,11 @@ function App() {
                   <DevLogin />
                 </Auth>
               } />
+              <Route path="/:username" element={
+                <Layout>
+                  <Profile />
+                </Layout>
+              } />
               <Route path="*" element={<Navigate to="/" replace />} />
             </>
           ) : (
@@ -103,6 +108,11 @@ function App() {
                     
                     <Route path="/dev/signin" element={<Navigate to="/dev" replace />} />
                     <Route path="/dev/signup" element={<Navigate to="/dev" replace />} />
+                    <Route path="/:username" element={
+                      <Layout>
+                        <Profile />
+                      </Layout>
+                    } />
                 </>
               )}
               {user_type === UserTypes.client && (
@@ -115,16 +125,16 @@ function App() {
                     
                     <Route path="/client/signin" element={<Navigate to="/client" replace />} />
                     <Route path="/client/signup" element={<Navigate to="/client" replace />} />
+                    <Route path="/:username" element={
+                      <Layout>
+                        <Profile />
+                      </Layout>
+                    } />
                 </>
               )}
             </>
           )
           }
-          <Route path="/:username" element={
-            <Layout>
-              <Profile />
-            </Layout>
-          } />
 
           <Route path="*" element={
             <div className="flex items-center justify-center h-screen">
