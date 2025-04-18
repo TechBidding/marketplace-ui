@@ -11,7 +11,7 @@ export const ServiceCard = ({ service, onEdit, onDelete }: {
             relative
             flex flex-col md:flex-row
             w-full lg:w-[32.5%] h-[700px] md:h-[400px]
-            p-4 gap-6
+            p-4 gap-4
             rounded-xl
             transition-all duration-300 ease-in-out
             shadow-sm hover:shadow-lg
@@ -19,20 +19,20 @@ export const ServiceCard = ({ service, onEdit, onDelete }: {
                 ? 'bg-green-950/90 hover:bg-green-950'
                 : 'bg-white hover:bg-white'}
         `}>
-            
+
 
 
             {/* Left Section - Image and Basic Info */}
             <div className={`
                 flex flex-col gap-4
-                w-full md:w-[50%] h-full
+                w-full md:w-[55%] h-full
                 p-2 rounded-lg shadow-sm
                 ${theme === "dark" ? 'bg-green-900/20' : 'bg-white/50'}
             `}>
                 {/* Title and Price */}
                 <div className="space-y-2 h-[20%]">
                     <h1 className={`
-                        text-2xl font-bold truncate
+                        text-l font-bold truncate
                         ${theme === "dark" ? 'text-gray-200' : 'text-gray-800'}
                     `}>
                         {service.name}
@@ -53,7 +53,7 @@ export const ServiceCard = ({ service, onEdit, onDelete }: {
                 <div className="relative group h-[80%]">
                     <div className="relative w-full h-full overflow-hidden rounded-lg shadow-md">
                         <img
-                            src={service.imageUrl}
+                            src={service.imgUrl}
                             alt={`${service.name} preview`}
                             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                         />
@@ -111,17 +111,19 @@ export const ServiceCard = ({ service, onEdit, onDelete }: {
                                     rounded-full text-xs font-medium
                                     transition-colors duration-200
                                     ${theme === "dark"
-                                        ? 'bg-green-900/30 hover:bg-green-900/50 text-emerald-200'
-                                        : 'bg-amber-100 hover:bg-amber-200 text-amber-700'}
-                                `}
+                                                                ? 'bg-green-900/30 hover:bg-green-900/50 text-emerald-200'
+                                                                : 'bg-amber-100 hover:bg-amber-200 text-amber-700'}
+        `}
                             >
-                                <span className="truncate max-w-[120px]">{skill.name}</span>
+                                <span className="truncate max-w-[120px]">
+                                    {typeof skill === 'string' ? skill : skill.name}
+                                </span>
                                 {skill.level && (
                                     <span className={`
                                         px-1.5 py-0.5 rounded-full text-[10px]
                                         ${theme === "dark"
-                                            ? 'bg-green-800/50 text-green-200'
-                                            : 'bg-amber-200/70 text-amber-700'}
+                                                                    ? 'bg-green-800/50 text-green-200'
+                                                                    : 'bg-amber-200/70 text-amber-700'}
                                     `}>
                                         {skill.level}
                                     </span>
@@ -159,25 +161,25 @@ export const ServiceCard = ({ service, onEdit, onDelete }: {
                             <div
                                 key={index}
                                 className={`
-                                    flex flex-col gap-1.5
-                                    min-w-[120px] max-w-[150px]
-                                    p-2.5 rounded-lg
-                                    transition-all duration-200
-                                    ${theme === "dark"
+            flex flex-col gap-1.5
+            min-w-[120px] max-w-[150px]
+            p-2.5 rounded-lg
+            transition-all duration-200
+            ${theme === "dark"
                                         ? 'bg-green-900/30 hover:bg-green-900/50'
                                         : 'bg-amber-100 hover:bg-amber-200'}
-                                `}
+        `}
                             >
                                 <span className="text-xs font-medium truncate">
-                                    {project.name}
+                                    {typeof project === 'string' ? project : project.name}
                                 </span>
                                 {project.status && (
                                     <span className={`
-                                        text-[10px] px-2 py-1 rounded-full w-fit
-                                        ${theme === "dark"
+                text-[10px] px-2 py-1 rounded-full w-fit
+                ${theme === "dark"
                                             ? 'bg-green-800/50 text-green-200'
                                             : 'bg-amber-200/70 text-amber-700'}
-                                    `}>
+            `}>
                                         {project.status}
                                     </span>
                                 )}

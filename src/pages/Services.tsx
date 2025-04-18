@@ -1,69 +1,79 @@
 import { ServiceCard } from "@/components/cards/ServiceCard"
+import { CreateService } from "@/components/CreateService";
+import { userHttp } from "@/utility/api";
 import { ConfirmModal } from "@/utility/confirmModal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
-let services = [
-    {
-        name: "Service 1",
-        description: "Description for Service 1 Description for Service1Descriptionfor Service1 Description for Service 1 Description for Service 1 Description for Service 1 Description for Service1 Description for Service 1",
-        pricing: {
-            "currency": "USD",
-            "amount": 100
-        },
-        skills: [{ name: "skill 2", id: 1 }, { name: "skill 1", id: 2 }],
-        projectIds: [{ name: "This si smy project name what about tyou 2", id: 1 }, { name: "this is amy project name 1", id: 2 }, { name: "project 2", id: 1 }, { name: "project 1", id: 2 }, { name: "project 2", id: 1 }, { name: "project 1", id: 2 }, { name: "project 2", id: 1 }, { name: "project 1", id: 2 }, { name: "project 2", id: 1 }, { name: "project 1", id: 2 }, { name: "project 2", id: 1 }, { name: "project 1", id: 2 }, { name: "project 2", id: 1 }, { name: "project 1", id: 2 }],
-        imageUrl: "https://github.com/shadcn.png",
-        id: 1
-    },
-    {
-        name: "Service 2",
-        description: "Description for Service 1 Description for Service1Descriptionfor Service1 Description for Service 1 Description for Service 1 Description for Service 1 Description for Service1 Description for Service 1",
-        pricing: {
-            "currency": "USD",
-            "amount": 100
-        },
-        skills: [{ name: "skill 2", id: 1 }, { name: "skill 1", id: 2 }],
-        projectIds: [{ name: "This si smy project name what about tyou 2", id: 1 }, { name: "this is amy project name 1", id: 2 }, { name: "project 2", id: 1 }, { name: "project 1", id: 2 }, { name: "project 2", id: 1 }, { name: "project 1", id: 2 }, { name: "project 2", id: 1 }, { name: "project 1", id: 2 }, { name: "project 2", id: 1 }, { name: "project 1", id: 2 }, { name: "project 2", id: 1 }, { name: "project 1", id: 2 }, { name: "project 2", id: 1 }, { name: "project 1", id: 2 }],
-        imageUrl: "https://github.com/shadcn.png",
-        id: 2
-    },
-    {
-        name: "Service 3",
-        description: "Description for Service 1 Description for Service1Descriptionfor Service1 Description for Service 1 Description for Service 1 Description for Service 1 Description for Service1 Description for Service 1",
-        pricing: {
-            "currency": "USD",
-            "amount": 100
-        },
-        skills: [],
-        projectIds: [],
-        imageUrl: "https://github.com/shadcn.png",
-        id: 3
-    },
-]
 
 
 export const Services = () => {
     const [showModal, setShowModal] = useState(false);
     const [operation, setOperation] = useState<"edit" | "delete" | undefined>(undefined);
     const [selectedService, setSelectedService] = useState<any>(null);
+    const [openCreateServiceModal, setOpenCreateServiceModal] = useState<boolean>(false);
+    const [servicesList, setServicesList] = useState<any[]>([]);
+    const userDetails = useSelector((state: any) => state.auth.userDetails)
 
     const handleDelete = (service: any) => {
-        services = services.filter((s) => s.id !== service.id);
+
+        userHttp.delete(`/service/${service._id}`)
+            .then((res) => {
+                toast.success("Service deleted successfully");
+                setServicesList((prev) => prev.filter((s) => s._id !== service._id));
+                setOperation(undefined);
+                setSelectedService(null);
+            })
+            .catch((err) => {
+                toast.error("Error while deleting service", {
+                   description: err.response.data.message
+               });
+            })
     };
 
     const navigate = useNavigate()
 
+    useEffect(() => {
+        userHttp.get(`/service?username=${userDetails.userName}`)
+            .then((res) => {
+                if (res.status === 200) {
+                    setServicesList(res.data);
+                    console.log("res.data", res.data);
+                }
+            }
+            )
+            .catch((err) => {
+                console.log(err);
+            }
+            )
+    }, [])
+
+
+
 
     return (
         <div className="p-4">
+            <div className="flex justify-between items-center mb-4">
+                <h1 className="text-2xl font-bold">My Services</h1>
+                <button
+                    className="bg-blue-500 text-white px-4 py-2 rounded"
+                    onClick={() => setOpenCreateServiceModal(true)}
+                >
+                    Create Service
+                </button>
+            </div>
+
             <div className="flex gap-3 flex-wrap md:flex md:flex-row">
-                {services.map((service, index) => (
+                {servicesList.map((service, index) => (
                     <ServiceCard
                         key={index}
                         service={service}
                         onEdit={(service) => {
-                            navigate(`/services/${service.id}/edit`)
+                            setOperation("edit");
+                            setOpenCreateServiceModal(true);
+                            setSelectedService(service);
                         }}
                         onDelete={(service) => {
                             setShowModal(true);
@@ -89,6 +99,19 @@ export const Services = () => {
                         setOperation(undefined);
                         setSelectedService(null);
                     }}
+                />
+            )}
+
+            {openCreateServiceModal && (
+                <CreateService onCancel={() => {
+                    setOpenCreateServiceModal(false);
+                }}
+                    setServicesList={setServicesList}
+                    setOpenCreateServiceModal={setOpenCreateServiceModal}
+                    selectedService={selectedService}
+                    operation={operation}
+                    setOperation={setOperation}
+                    setSelectedService={setSelectedService}
                 />
             )}
         </div>
