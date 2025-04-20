@@ -4,6 +4,7 @@ import { userHttp } from "@/utility/api";
 import { toast } from "sonner";
 import { ConfirmModal } from "@/utility/confirmModal";
 import { useEffect, useRef, useState } from "react";
+import { useSelector } from "react-redux";
 
 interface EditProfileProps {
     isProfileEditing: boolean;
@@ -14,6 +15,7 @@ interface EditProfileProps {
         email: string;
         phoneNumber: string;
         profilePicture?: string;
+        company?: string;
     };
 }
 
@@ -24,9 +26,12 @@ export const EditProfile = ({ isProfileEditing, setIsProfileEditing, userData }:
             name: userData.name,
             bio: userData?.bio || '',
             email: userData.email,
-            phoneNumber: userData.phoneNumber
+            phoneNumber: userData.phoneNumber,
+            company: userData?.company || ""
         }
     });
+    const userType = useSelector((state: any) => state.auth.userType)
+
 
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const [imagePreview, setImagePreview] = useState<string>(userData?.profilePicture || 'https://github.com/shadcn.png');
@@ -40,6 +45,7 @@ export const EditProfile = ({ isProfileEditing, setIsProfileEditing, userData }:
     const email = watch("email");
     const phoneNumber = watch("phoneNumber");
     const bio = watch("bio");
+    const company = watch("company");
 
 
     const initialDataRef = useRef({
@@ -47,7 +53,8 @@ export const EditProfile = ({ isProfileEditing, setIsProfileEditing, userData }:
         email: userData.email,
         phoneNumber: userData.phoneNumber,
         profilePicture: userData?.profilePicture || 'https://github.com/shadcn.png',
-        bio: userData?.bio || ''
+        bio: userData?.bio || '',
+        company: userData?.company || ""
     });
 
 
@@ -57,10 +64,11 @@ export const EditProfile = ({ isProfileEditing, setIsProfileEditing, userData }:
             email !== initialDataRef.current.email ||
             phoneNumber !== initialDataRef.current.phoneNumber ||
             imagePreview !== initialDataRef.current.profilePicture ||
-            bio !== initialDataRef.current.bio
+            bio !== initialDataRef.current.bio ||
+            company !== initialDataRef.current.company
         );
         setHasFieldsChanged(currentDataChanged);
-    }, [name, email, phoneNumber, imagePreview, bio]);
+    }, [name, email, phoneNumber, imagePreview, bio, company]);
 
 
 
@@ -80,10 +88,11 @@ export const EditProfile = ({ isProfileEditing, setIsProfileEditing, userData }:
         oldData.name !== data.name && formData.append("name", data.name);
         oldData.phoneNumber !== data.phoneNumber && formData.append("phoneNumber", data.phoneNumber);
         oldData.bio !== data.bio && formData.append("bio", data.bio);
+        oldData.company !== data.company && formData.append("company", data.company);
         
         setIsUpdating(true);
         setIsModalOpen(false)
-        userHttp.put('developer', formData)
+        userHttp.put(`${userType === 'client'? "client": "developer"}`, formData)
             .then((res) => {
                 toast.success("Profile updated successfully", {
                     description: res.data.message
@@ -252,6 +261,30 @@ export const EditProfile = ({ isProfileEditing, setIsProfileEditing, userData }:
                             placeholder="Enter phone number"
                         />
                     </div>
+
+                    {userType === 'client' && (
+                        <div className="space-y-2 text-left">
+                            <label
+                                className={`text-sm font-medium
+                                    ${theme === "dark" ? 'text-gray-200' : 'text-gray-700'}
+                                `}
+                            >
+                                Company
+                            </label>
+                            <input
+                                {...register("company")}
+                                className={`
+                                    w-full px-4 py-2 rounded-lg
+                                    border focus:outline-none focus:ring-2
+                                    transition duration-200
+                                    ${theme === "dark"
+                                        ? 'bg-green-900/30 border-green-800 focus:ring-green-700 text-gray-200'
+                                        : 'bg-white border-gray-200 focus:ring-amber-500 text-gray-900'}
+                                `}
+                                placeholder="Enter company name"
+                            />
+                        </div>
+                    )}
                 </div>
 
                 <div className="flex justify-end gap-3 pt-4">
