@@ -18,6 +18,7 @@ import Layout from './layout/Layout'
 import { Home } from './pages/Home'
 import { Services } from './pages/Services'
 import { Profile } from './pages/Profile'
+import { Project } from './pages/Project'
 
 enum UserTypes {
   developer = "developer",
@@ -128,6 +129,11 @@ function App() {
                     <Route path="/user/:username" element={
                       <Layout>
                         <Profile />
+                      </Layout>
+                    } />
+                    <Route path="/project/:id" element={
+                      <Layout>
+                        <Project />
                       </Layout>
                     } />
                 </>
