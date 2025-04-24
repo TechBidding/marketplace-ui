@@ -2,11 +2,12 @@ import React, { useRef, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useTheme } from "./theme-provider";
-import { ServiceEnum, SkillEnum } from "../utility/contants";
+import { useTheme } from "../../components/theme-provider";
+import { ServiceEnum, SkillEnum } from "../../utility/contants";
 import { createProjectSchema } from "@/utility/Schema/createProjectSchema";
 import { projectHttp } from "@/utility/api";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 
 
@@ -62,6 +63,7 @@ export default function CreateProjectPage() {
     const [image, setImage] = useState<string | null>(null);
     const [file, setFile] = useState<File | null>(null);
     const handleImageClick = () => imgRef.current?.click();
+    const navigate = useNavigate();
 
     /* ----------------------- theme utilities -------------------------- */
     const bgPage = isDark ? "bg-neutral-950" : "bg-gray-100";
@@ -76,9 +78,9 @@ export default function CreateProjectPage() {
     const dangerBtn = isDark
         ? "bg-red-700 hover:bg-red-600 text-red-200"
         : "bg-red-100 hover:bg-red-200 text-red-700";
-    
-    
-    
+
+
+
 
     async function onSubmit(data: ICreateProjectSchema) {
         if (!file) {
@@ -110,6 +112,7 @@ export default function CreateProjectPage() {
         try {
             const res = await projectHttp.post("/projects", fd);
             const resData = res.data;
+            navigate(`/project/${resData.data._id}`);
             toast.success("Project created successfully");
         } catch (err: any) {
             toast.error("Error creating project", {

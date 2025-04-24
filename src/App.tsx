@@ -18,7 +18,9 @@ import Layout from './layout/Layout'
 import { Home } from './pages/Home'
 import { Services } from './pages/Services'
 import { Profile } from './pages/Profile'
-import { Project } from './pages/Project'
+import { Project } from './pages/Project/Project'
+import CreateProjectPage from './pages/Project/CreateProject'
+import { ProjectDetails } from './pages/Project/ProjectDetails'
 
 enum UserTypes {
   developer = "developer",
@@ -131,9 +133,19 @@ function App() {
                         <Profile />
                       </Layout>
                     } />
-                    <Route path="/project/:id" element={
+                    <Route path="/project" element={
                       <Layout>
                         <Project />
+                      </Layout>
+                    } />
+                    <Route path="/project/create" element={
+                      <Layout>
+                        <CreateProjectPage />
+                      </Layout>
+                    } />
+                    <Route path="/project/:id" element={
+                      <Layout>
+                        <ProjectDetails />
                       </Layout>
                     } />
                 </>
