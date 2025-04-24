@@ -5,6 +5,8 @@ import { z } from "zod";
 import { useTheme } from "./theme-provider";
 import { ServiceEnum, SkillEnum } from "../utility/contants";
 import { createProjectSchema } from "@/utility/Schema/createProjectSchema";
+import { projectHttp } from "@/utility/api";
+import { toast } from "sonner";
 
 
 
@@ -33,11 +35,12 @@ const FormField: React.FC<FormFieldProps> = ({
         {error && <p className="text-sm text-red-500">{error}</p>}
     </div>
 );
+
+
 export default function CreateProjectPage() {
     const { theme } = useTheme();
     const isDark = theme === "dark";
 
-    /* ---------------------------- form hooks --------------------------- */
     const {
         register,
         control,
@@ -57,6 +60,7 @@ export default function CreateProjectPage() {
     /* ----------------------------- image ------------------------------ */
     const imgRef = useRef<HTMLInputElement>(null);
     const [image, setImage] = useState<string | null>(null);
+    const [file, setFile] = useState<File | null>(null);
     const handleImageClick = () => imgRef.current?.click();
 
     /* ----------------------- theme utilities -------------------------- */
@@ -72,11 +76,48 @@ export default function CreateProjectPage() {
     const dangerBtn = isDark
         ? "bg-red-700 hover:bg-red-600 text-red-200"
         : "bg-red-100 hover:bg-red-200 text-red-700";
+    
+    
+    
 
-    function onSubmit(data: ICreateProjectSchema) {
-        console.log("CREATE PROJECT", { ...data, image });
-        
+    async function onSubmit(data: ICreateProjectSchema) {
+        if (!file) {
+            alert("Choose an image first");
+            return;
+        }
+
+        const fd = new FormData();
+
+        /* -------------- primitives ---------------- */
+        fd.append("title", data.title);
+        fd.append("description", data.description);
+        fd.append("deadline", data.deadline.toISOString());
+
+        /* -------------- pricing (object) ---------- */
+        // send as “dotted” keys so Nest turns it back into an object
+        fd.append("pricing.currency", data.pricing.currency);
+        fd.append("pricing.amount", data.pricing.amount.toString());
+
+        /* -------------- arrays -------------------- */
+        data.serviceType.forEach(s => fd.append("serviceType", s));
+        data.requiredSkills.forEach(s => fd.append("requiredSkills", s));
+        data.requirements?.forEach(r => fd.append("requirements", r));
+        data.projectIds?.forEach(id => fd.append("projectIds", id));
+
+        /* -------------- file ---------------------- */
+        fd.append("image", file);      // “image” must match @FileInterceptor('image')
+
+        try {
+            const res = await projectHttp.post("/projects", fd);
+            const resData = res.data;
+            toast.success("Project created successfully");
+        } catch (err: any) {
+            toast.error("Error creating project", {
+                description: err.response.data.message
+            });
+        }
     }
+
 
     const serviceOptions = Object.values(ServiceEnum);
     const skillOptions = Object.values(SkillEnum);
@@ -87,7 +128,6 @@ export default function CreateProjectPage() {
             <div className="w-full max-w-4xl space-y-8">
                 <h1 className={`text-2xl font-semibold ${textClr}`}>Create New Project</h1>
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-                    {/* Card Group 1: Project Title, Description, Budget & Currency */}
                     <div className={`p-6 ${bgCard} ${textClr} rounded-xl shadow-sm border ${borderClr} flex flex-col gap-6`}>
                         {/* Project Title */}
                         <FormField label="Project Title" htmlFor="title" error={errors.title?.message}>
@@ -147,7 +187,6 @@ export default function CreateProjectPage() {
                         </div>
                     </div>
 
-                    {/* Card Group 2: Service Types, Required Skills, Additional Requirements */}
                     <div className={`p-6 ${bgCard} ${textClr} rounded-xl shadow-sm border ${borderClr} flex flex-col gap-8`}>
                         {/* Service Types */}
                         <FormField label="Service Types" error={errors.serviceType?.message}>
@@ -204,7 +243,6 @@ export default function CreateProjectPage() {
                         </FormField>
                     </div>
 
-                    {/* Card Group 3: Deadline, Project Image */}
                     <div className={`p-6 ${bgCard} ${textClr} rounded-xl shadow-sm border ${borderClr} flex flex-col gap-6`}>
                         <FormField label="Deadline" htmlFor="deadline" error={errors.deadline?.message}>
                             <input
@@ -231,6 +269,7 @@ export default function CreateProjectPage() {
                                     onChange={(e) => {
                                         const file = e.target.files?.[0];
                                         setImage(file ? URL.createObjectURL(file) : null);
+                                        file ? setFile(file) : setFile(null);
                                     }}
                                 />
                                 {image ? (
