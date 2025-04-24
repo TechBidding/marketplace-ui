@@ -126,7 +126,7 @@ export const Navbar = () => {
                         <DropdownMenuTrigger className="mt-auto pt-4  border-t-2 border-gray-400 flex items-center flex-row gap-4 cursor-pointer">
                             <div className="mr-2">
                                 <Avatar>
-                                    <AvatarImage src={userDetails.profilePicture || "https://github.com/shadcn.png"} alt="profile picture" />
+                                    <AvatarImage src={userDetails?.profilePicture || "https://github.com/shadcn.png"} alt="profile picture" />
                                     <AvatarFallback>CN</AvatarFallback>
                                 </Avatar>
                             </div>

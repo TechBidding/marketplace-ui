@@ -11,34 +11,30 @@ import { toast } from 'sonner'
 export const UserInfo = () => {
     const { theme } = useTheme()
     const userDetails = useSelector((state: any) => state.auth.userDetails)
-    const userType = useSelector((state: any) => state.auth.userType)
     const isLoggedIn = useSelector((state: any) => state.auth.isLoggedIn)
     const params = useParams()
     const [userData, setUserData] = useState<any>(null)
     const [isProfileEditing, setIsProfileEditing] = useState(false)
 
     useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const res = await userHttp.get(`developer/${params.username}`);
+                setUserData(res.data);
+            } catch (err) {
+                try {
+                    const res = await userHttp.get(`client/${params.username}`);
+                    setUserData(res.data.data);
+                } catch (err: any) {
+                    toast.error("Error fetching user data", {
+                        description: err.response.data.message
+                    });
+                }
+            }
+        };
 
-        if (userType === 'developer') {
-            userHttp.get(`developer/${params.username}`).then((res) => {
-                setUserData(res.data)
-            }).catch((err) => {
-                toast.error("Error fetching user data", {
-                    description: err.response.data.message
-                });
-            })
-        }
-        else {
-            userHttp.get(`client/${params.username}`).then((res) => {
-                setUserData(res.data.data)
-            }).catch((err) => {
-                toast.error("Error fetching user data", {
-                    description: err.response.data.message
-                });
-            })
-        }
-
-    }, [isProfileEditing])
+        fetchUserData();
+    }, [params.username]);
 
     return (
         <div className={`
@@ -90,7 +86,7 @@ export const UserInfo = () => {
                                 <FaPhoneAlt className={theme === "dark" ? 'text-gray-400' : 'text-gray-500'} />
                                 <span>{userData?.phoneNumber}</span>
                             </div>
-                            {userType === 'client' && userData?.company && (
+                            {userData?.company && (
                                 <div className="flex items-center gap-3">
                                     <FaPhoneAlt className={theme === "dark" ? 'text-gray-400' : 'text-gray-500'} />
                                     <span>{userData?.company}</span>
