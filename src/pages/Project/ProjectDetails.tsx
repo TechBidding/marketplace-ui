@@ -1,7 +1,20 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { HiOutlineDotsHorizontal, HiOutlineChatAlt2 } from "react-icons/hi";
-import { MdEdit, MdPlaylistAddCheck, MdOutlinePlaylistAdd } from "react-icons/md";
+import { MdEdit, MdPlaylistAddCheck, MdOutlinePlaylistAdd, MdMoreHoriz } from "react-icons/md";
 import { useTheme } from "../../components/theme-provider"; // Added theme provider
+import { projectHttp } from "@/utility/api";
+import { useParams } from "react-router-dom";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+
 
 const DUMMY_PROJECT = {
   title: "Build a Mobile App",
@@ -24,6 +37,12 @@ const DUMMY_PROJECT = {
     role: "Senior Developer",
     rate: "$80.00/hr",
   },
+  bids: [
+    { id: 1, title: "Bid 1", description: "Bid 1 description", amount: "$1000", status: "Accepted", createdAt: "2024-01-01", developerId: 1 },
+    { id: 2, title: "Bid 2", description: "Bid 2 description", amount: "$2000", status: "Pending", createdAt: "2024-01-01", developerId: 2 },
+    { id: 3, title: "Bid 3", description: "Bid 3 description", amount: "$3000", status: "Pending", createdAt: "2024-01-01", developerId: 3 },
+    { id: 4, title: "Bid 4", description: "Bid 4 description", amount: "$4000", status: "Rejected", createdAt: "2024-01-01", developerId: 4 },
+  ],
 };
 
 const StatusBadge: React.FC<{ status: string }> = ({ status }) => (
@@ -44,7 +63,35 @@ export default function ProjectDetails() {
   const subtleText = isDark ? "text-gray-400" : "text-gray-500";
   const hoverClr = isDark ? "hover:bg-neutral-800" : "hover:bg-gray-50";
 
-  const [activeTab, setActiveTab] = useState<"overview" | "milestones" | "proposals">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "milestones" | "proposals" | "bids">("overview");
+  const [expanded, setExpanded] = useState<Record<number, boolean>>({});
+
+  const [project, setProject] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const { id } = useParams();
+
+
+  useEffect(() => {
+    setLoading(true);
+    projectHttp.get(`projects/${id}`).then((res) => {
+      console.log(res.data);
+      setProject(res.data);
+      toast.success("Project details fetched successfully");
+    }).catch((err) => {
+      console.log(err);
+      toast.error("Error fetching project details", {
+        description: err.response.data.message
+      });
+    }).finally(() => {
+      setLoading(false);
+    })
+  }, [])
+
+  if (loading) {
+    return <div className="flex justify-center items-center h-screen">
+      <Loader2 className="h-10 w-10 animate-spin" />
+    </div>
+  }
 
   return (
     <div className={`min-h-screen ${bgPage} flex justify-center`}>
@@ -73,6 +120,7 @@ export default function ProjectDetails() {
             { id: "overview", label: "Overview" },
             { id: "milestones", label: "Milestones" },
             { id: "proposals", label: "Proposals" },
+            { id: "bids", label: "Bids" },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -177,6 +225,17 @@ export default function ProjectDetails() {
             {activeTab === "proposals" && (
               <div className="mt-8 text-gray-500">No proposals yet.</div>
             )}
+
+            {/* Bids Tab */}
+            {activeTab === "bids" && (
+              <div className="mt-8 space-y-4">
+                {DUMMY_PROJECT.bids.map((bid) => {
+                  return (
+                    <BidCard bid={bid} hoverClr={hoverClr} borderClr={borderClr} expanded={expanded} setExpanded={setExpanded} />
+                  )
+                })}
+              </div>
+            )}
           </div>
 
           {/* Right Sidebar */}
@@ -231,3 +290,66 @@ const SidebarAction: React.FC<ActionProps> = ({ icon, label, hoverClr }) => (
     {label}
   </button>
 );
+
+interface BidProps {
+  bid: any;
+  hoverClr: string;
+  borderClr: string;
+  expanded: Record<number, boolean>;
+  setExpanded: (expanded: Record<number, boolean>) => void;
+}
+const BidCard: React.FC<BidProps> = ({ bid, hoverClr, borderClr, expanded, setExpanded }) => {
+
+  const handleBidAction = (bidId: number, action: string) => {
+    console.log(bidId, action);
+  }
+
+  return (
+    <div
+      key={bid.id}
+      className={`flex flex-col rounded-lg border px-5 py-4 transition-all duration-200 hover:shadow-lg ${hoverClr} ${borderClr}`}
+    >
+      <div className={`flex items-center justify-between w-full gap-5 ${expanded ? "mb-4" : ""}`}>
+        <div className="flex items-center justify-between w-full cursor-pointer" onClick={() => setExpanded({ [bid.id]: !expanded[bid.id] })}>
+          <div className="flex items-center gap-3">
+            {bid.status === "Accepted" ? (
+              <MdPlaylistAddCheck className="h-5 w-5 text-emerald-600" />
+            ) : (
+              <MdOutlinePlaylistAdd className="h-5 w-5 text-gray-400" />
+            )}
+            <span className="font-medium text-lg">{bid.title}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            {bid.status === "Pending" && <span className="text-sm text-yellow-600 font-semibold">Pending</span>}
+            {bid.status === "Rejected" && <span className="text-sm text-red-600 font-semibold">Rejected</span>}
+            {bid.status === "Accepted" && <span className="text-sm text-green-600 font-semibold">Accepted</span>}
+          </div>
+        </div>
+        <div className="flex items-center gap-4">
+          <button className="text-sm text-gray-400 hover:text-gray-600 cursor-pointer">
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <MdMoreHoriz className="h-5 w-5" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuLabel>Bid Actions</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => handleBidAction(bid.id, "accept")} className="text-green-600 cursor-pointer">Accept</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleBidAction(bid.id, "reject")} className="text-red-600 cursor-pointer">Reject</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+          </button>
+        </div>
+      </div>
+      {expanded[bid.id] && (
+        <div className="mt-4 w-full text-left text-sm ">
+          <p className="mb-1"><span className="font-semibold">Description:</span> {bid.description}</p>
+          <p className="mb-1"><span className="font-semibold">Amount:</span> {bid.amount}</p>
+          <p className="mb-1"><span className="font-semibold">Created At:</span> {bid.createdAt}</p>
+          <p className="mb-1"><span className="font-semibold">Developer ID:</span> {bid.developerId}</p>
+        </div>
+      )}
+    </div>
+  );
+}
