@@ -20,7 +20,7 @@ import { Services } from './pages/Services'
 import { Profile } from './pages/Profile'
 import { Project } from './pages/Project/Project'
 import CreateProjectPage from './pages/Project/CreateProject'
-import { ProjectDetails } from './pages/Project/ProjectDetails'
+import  ProjectDetails  from './pages/Project/ProjectDetails'
 
 enum UserTypes {
   developer = "developer",
