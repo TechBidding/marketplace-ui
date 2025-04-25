@@ -45,7 +45,7 @@ const DUMMY_PROJECT = {
   ],
 };
 
-const StatusBadge: React.FC<{ status: string }> = ({ status }) => (
+export const StatusBadge: React.FC<{ status: string }> = ({ status }) => (
   <span className="inline-flex items-center rounded-full bg-emerald-600/90 px-3 py-1 text-sm font-medium text-white">
     {status}
   </span>
@@ -63,7 +63,7 @@ export default function ProjectDetails() {
   const subtleText = isDark ? "text-gray-400" : "text-gray-500";
   const hoverClr = isDark ? "hover:bg-neutral-800" : "hover:bg-gray-50";
 
-  const [activeTab, setActiveTab] = useState<"overview" | "milestones" | "proposals" | "bids">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "milestones" | "bids">("overview");
   const [expanded, setExpanded] = useState<Record<number, boolean>>({});
 
   const [project, setProject] = useState<any>(null);
@@ -119,7 +119,6 @@ export default function ProjectDetails() {
           {[
             { id: "overview", label: "Overview" },
             { id: "milestones", label: "Milestones" },
-            { id: "proposals", label: "Proposals" },
             { id: "bids", label: "Bids" },
           ].map((tab) => (
             <button
@@ -219,11 +218,6 @@ export default function ProjectDetails() {
                   </div>
                 ))}
               </div>
-            )}
-
-            {/* Proposals Tab */}
-            {activeTab === "proposals" && (
-              <div className="mt-8 text-gray-500">No proposals yet.</div>
             )}
 
             {/* Bids Tab */}
