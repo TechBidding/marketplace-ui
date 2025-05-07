@@ -116,6 +116,11 @@ function App() {
                         <Profile />
                       </Layout>
                     } />
+                    <Route path="/project/:id" element={
+                      <Layout>
+                        <ProjectDetails />
+                      </Layout>
+                    } />
                 </>
               )}
               {user_type === UserTypes.client && (

@@ -14,6 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useSelector } from "react-redux";
 
 
 const DUMMY_PROJECT = {
@@ -70,12 +71,19 @@ export default function ProjectDetails() {
   const [loading, setLoading] = useState(true);
   const { id } = useParams();
 
+  const user_type = useSelector((state: any) => state.auth.userType);
+  const userDetails = useSelector((state: any) => state.auth.userDetails);
+
+  const [showBid, setShowBid] = useState<boolean>(false);
+  const [showMilestones, setShowMilestones] = useState<boolean>(false)
+
+
 
   useEffect(() => {
     setLoading(true);
     projectHttp.get(`projects/${id}`).then((res) => {
-      console.log(res.data);
-      setProject(res.data);
+      console.log(res.data.data);
+      setProject(res.data.data);
       toast.success("Project details fetched successfully");
     }).catch((err) => {
       console.log(err);
@@ -85,7 +93,17 @@ export default function ProjectDetails() {
     }).finally(() => {
       setLoading(false);
     })
+
   }, [])
+
+  useEffect(() => {
+    if (user_type === 'client' && userDetails._id === project?.clientId) {
+      setShowBid(true);
+    } else {
+      setShowBid(false);
+    }
+  }, [user_type, userDetails, project]);
+
 
   if (loading) {
     return <div className="flex justify-center items-center h-screen">
@@ -125,9 +143,7 @@ export default function ProjectDetails() {
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
               className={
-                activeTab === tab.id
-                  ? "border-b-2 border-indigo-400 text-indigo-400 pb-2 cursor-pointer"
-                  : `pb-2 hover:text-indigo-400 ${subtleText} cursor-pointer`
+                `${activeTab === tab.id ? "border-b-2 border-indigo-400 text-indigo-400 pb-2 cursor-pointer" : `pb-2 hover:text-indigo-400 ${subtleText} cursor-pointer`} ${tab.id === 'bids' && !showBid ? "hidden" : "show"}`
               }
             >
               {tab.label}
@@ -235,9 +251,17 @@ export default function ProjectDetails() {
           {/* Right Sidebar */}
           <aside className="w-full md:w-1/3 space-y-6">
             <div className={`space-y-4 rounded-lg border ${borderClr} p-4`}>
-              <SidebarAction icon={<MdEdit className="h-4 w-4" />} label="Edit Project" hoverClr={hoverClr} />
-              <SidebarAction icon={<MdOutlinePlaylistAdd className="h-4 w-4" />} label="Create Milestone" hoverClr={hoverClr} />
-              <SidebarAction icon={<HiOutlineChatAlt2 className="h-4 w-4" />} label="View Proposal" hoverClr={hoverClr} />
+              {user_type === 'client' && (
+                <>
+                  <SidebarAction icon={<MdEdit className="h-4 w-4" />} label="Edit Project" hoverClr={hoverClr} />
+                  <SidebarAction icon={<MdOutlinePlaylistAdd className="h-4 w-4" />} label="Create Milestone" hoverClr={hoverClr} />
+                  <SidebarAction icon={<HiOutlineChatAlt2 className="h-4 w-4" />} label="View Proposal" hoverClr={hoverClr} />
+                </>
+              )}
+              {user_type === 'developer' && (<>
+                <SidebarAction icon={<HiOutlineChatAlt2 className="h-4 w-4" />} label="Bid on this project" hoverClr={hoverClr} />
+              </>)}
+              
             </div>
 
             <div className={`space-y-4 rounded-lg border ${borderClr} p-4`}>
