@@ -3,7 +3,7 @@ import { HiOutlineDotsHorizontal, HiOutlineChatAlt2 } from "react-icons/hi";
 import { MdEdit, MdPlaylistAddCheck, MdOutlinePlaylistAdd, MdMoreHoriz } from "react-icons/md";
 import { useTheme } from "../../components/theme-provider"; // Added theme provider
 import { projectHttp } from "@/utility/api";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import {
@@ -18,7 +18,7 @@ import { useSelector } from "react-redux";
 import BidPopup from "./BidPopup";
 
 type BidStatus = "pending" | "rejected" | "accepted";
-export interface UserBidType{
+export interface UserBidType {
   "projectId": string;
   "developerId": string;
   "proposedBudget": number;
@@ -30,35 +30,20 @@ export interface UserBidType{
   "__v": number;
   "_id": number;
 }
+export interface MilestoneType{
+  _id: string;
+  projectId: string;
+  title: string;
+  description: string;
+  status: string;
+  dueDate: Date
+  amount: {
+    currency: string;
+    value: number;
+  };
+  position: number
+}
 
-const DUMMY_PROJECT = {
-  title: "Build a Mobile App",
-  status: "In Progress",
-  description:
-    "Design an iOS and Android fintech application with a focus on user-friendly design and performance.",
-  requirements: ["Experience in React Native or Flutter", "UI/UX design skills"],
-  skills: ["React Native", "Flutter", "UI/UX Design"],
-  budget: "$10,000",
-  deadline: "2024-05-01",
-  serviceType: ["Mobile App Development"],
-  milestones: [
-    { id: 1, title: "Milestone 1", done: true },
-    { id: 2, title: "Milestone 2", done: true },
-    { id: 3, title: "Milestone 3", done: false },
-    { id: 4, title: "Milestone 4", done: false },
-  ],
-  developer: {
-    name: "Jacob Jones",
-    role: "Senior Developer",
-    rate: "$80.00/hr",
-  },
-  bids: [
-    { id: 1, title: "Bid 1", description: "Bid 1 description", amount: "$1000", status: "Accepted", createdAt: "2024-01-01", developerId: 1 },
-    { id: 2, title: "Bid 2", description: "Bid 2 description", amount: "$2000", status: "Pending", createdAt: "2024-01-01", developerId: 2 },
-    { id: 3, title: "Bid 3", description: "Bid 3 description", amount: "$3000", status: "Pending", createdAt: "2024-01-01", developerId: 3 },
-    { id: 4, title: "Bid 4", description: "Bid 4 description", amount: "$4000", status: "Rejected", createdAt: "2024-01-01", developerId: 4 },
-  ],
-};
 
 export const StatusBadge: React.FC<{ status: string }> = ({ status }) => (
   <span className="inline-flex items-center rounded-full bg-emerald-600/90 px-3 py-1 text-sm font-medium text-white">
@@ -91,10 +76,10 @@ export default function ProjectDetails() {
   const [showBid, setShowBid] = useState<boolean>(false);
   const [showMilestones, setShowMilestones] = useState<boolean>(false);
 
-  const [userBid, setUserBid] = useState < UserBidType> ();
+  const [userBid, setUserBid] = useState<UserBidType>();
 
   const [allBids, setAllBids] = useState<any>();
-  const [allMilestones, setAllMilestones] = useState();
+  const [allMilestones, setAllMilestones] = useState<MilestoneType[]>();
   const [isBidPopupOpen, setIsBidPopupOpen] = useState(false);
 
   const openBidPopup = () => {
@@ -105,6 +90,11 @@ export default function ProjectDetails() {
     setIsBidPopupOpen(false);
   };
 
+  console.log(showBid, showMilestones)
+  console.log("All Bids: ", allBids);
+  console.log("all milestones: ", allMilestones);
+
+  console.log(userDetails)
 
 
   useEffect(() => {
@@ -136,32 +126,45 @@ export default function ProjectDetails() {
     else {
       setShowMilestones(false);
     }
-    console.log("project: ",project)
+    console.log("project: ", project)
     if (user_type === 'developer' && project) {
       let projectId = String(project?._id)
       console.log("projectId: ", projectId)
       projectHttp(`/project/${projectId}/bid/dev`)
-        .then((res:any) => {
+        .then((res: any) => {
           setUserBid(res.data.data);
-      })
+        })
     }
 
   }, [user_type, userDetails, project]);
 
 
   useEffect(() => {
-    if (showBid && activeTab==='bids') {
-      //get all the bids of the project
+    if (showBid && activeTab === 'bids') {
+      projectHttp.get(`project/${project._id}/bid`)
+        .then((res) => {
+          console.log("all bids: ", res.data)
+          setAllBids(res.data);
+        })
+        .catch((error) => {
+          toast.error("Error fetching all bids", {
+            description: error.response.data.message
+          });
+        })
     }
     if (showMilestones && activeTab === 'milestones') {
-      //get all the milestones of the project.
+      projectHttp.get(`project/${project._id}/milestone`)
+        .then((res) => {
+          setAllMilestones(res.data.data);
+        })
+        .catch((error) => {
+          toast.error("Error fetching project milestones", {
+            description: error.response.data.message
+          });
+      })
     }
-  }, [showBid, showMilestones, activeTab])
+  }, [showBid, showMilestones, activeTab, project])
 
-
-  // const handleBidClick = () => {
-    
-  // }
 
 
   if (loading) {
@@ -187,9 +190,9 @@ export default function ProjectDetails() {
 
         <div className="flex flex-col md:flex-row items-start justify-between gap-8 px-6 pt-4 text-sm font-medium">
           <h1 className={`text-4xl font-bold tracking-tight ${textClr}`}>
-            {DUMMY_PROJECT.title}
+            {project.title}
           </h1>
-          <StatusBadge status={DUMMY_PROJECT.status} />
+          <StatusBadge status={project.status} />
         </div>
 
         <div className="px-6 pt-4 flex gap-8 text-sm font-medium mt-5">
@@ -221,14 +224,14 @@ export default function ProjectDetails() {
                 <section>
                   <h2 className="text-xl font-bold mb-2">Project Description</h2>
                   <p className="leading-relaxed">
-                    {DUMMY_PROJECT.description}
+                    {project.description}
                   </p>
                 </section>
 
                 <section>
                   <h2 className="text-xl font-bold mb-2">Project Requirements</h2>
                   <ul className="list-disc list-inside space-y-1">
-                    {DUMMY_PROJECT.requirements.map((req) => (
+                    {project.requirements.map((req) => (
                       <li key={req}>{req}</li>
                     ))}
                   </ul>
@@ -238,29 +241,29 @@ export default function ProjectDetails() {
                   <h2 className="text-xl font-bold mb-2">Project Details</h2>
                   <div className="space-y-1">
                     <p>
-                      <span className="font-semibold">Budget:</span> {DUMMY_PROJECT.budget}
+                      <span className="font-semibold">Budget:</span> {project.pricing.amount} {project.pricing.currency}
                     </p>
                     <p>
                       <span className="font-semibold">Service Type:</span>{" "}
-                      {DUMMY_PROJECT.serviceType.join(", ")}
+                      {project.serviceType.join(", ")}
                     </p>
                     <p>
                       <span className="font-semibold">Skills:</span>{" "}
-                      {DUMMY_PROJECT.skills.join(", ")}
+                      {project.requiredSkills.join(", ")}
                     </p>
                   </div>
                 </section>
 
-                <section className={`${showMilestones?"show":"hidden"}`}>
+                {/* <section className={`${showMilestones?"show":"hidden"}`}>
                   <div className="flex items-center justify-between mb-2">
                     <h2 className="text-lg font-semibold">Milestones</h2>
                     <span className="text-sm">
-                      {DUMMY_PROJECT.milestones.filter((m) => m.done).length} of{" "}
-                      {DUMMY_PROJECT.milestones.length} completed
+                      {project.milestones.filter((m) => m.done).length} of{" "}
+                      {project.milestones.length} completed
                     </span>
                   </div>
                   <div className={`divide-y rounded-md border ${borderClr}`}>
-                    {DUMMY_PROJECT.milestones.map((m) => (
+                    {project.milestones.map((m) => (
                       <div key={m.id} className={`flex items-center justify-between px-4 py-3 cursor-pointer ${hoverClr}`}>
                         <span>{m.title}</span>
                         {m.done ? (
@@ -271,27 +274,27 @@ export default function ProjectDetails() {
                       </div>
                     ))}
                   </div>
-                </section>
+                </section> */}
               </div>
             )}
 
             {/* Milestones Tab */}
             {activeTab === "milestones" && (
               <div className="mt-8 space-y-4">
-                {DUMMY_PROJECT.milestones.map((m) => (
+                {allMilestones && allMilestones.map((m) => (
                   <div
-                    key={m.id}
+                    key={m._id}
                     className={`flex items-center justify-between rounded-lg border px-5 py-4 cursor-pointer ${hoverClr} ${borderClr}`}
                   >
                     <div className="flex items-center gap-3">
-                      {m.done ? (
+                      {m.status ==='completed' ? (
                         <MdPlaylistAddCheck className="h-5 w-5 text-emerald-600" />
                       ) : (
                         <MdOutlinePlaylistAdd className="h-5 w-5 text-gray-400" />
                       )}
                       <span className="font-medium">{m.title}</span>
                     </div>
-                    {m.done && <span className="text-sm text-emerald-600">Completed</span>}
+                    {m.status === "completed" && <span className="text-sm text-emerald-600">Completed</span>}
                   </div>
                 ))}
               </div>
@@ -300,7 +303,7 @@ export default function ProjectDetails() {
             {/* Bids Tab */}
             {activeTab === "bids" && (
               <div className="mt-8 space-y-4">
-                {DUMMY_PROJECT.bids.map((bid) => {
+                {allBids && allBids.map((bid) => {
                   return (
                     <BidCard bid={bid} hoverClr={hoverClr} borderClr={borderClr} expanded={expanded} setExpanded={setExpanded} />
                   )
@@ -322,18 +325,28 @@ export default function ProjectDetails() {
               {user_type === 'developer' && (<>
                 {!userBid && (<>
                   <SidebarAction icon={<HiOutlineChatAlt2 className="h-4 w-4" />} label="Bid on this project" hoverClr={hoverClr} onClick={openBidPopup} />
-                  {isBidPopupOpen && <BidPopup close={closeBidPopup} userId={userDetails._id} projectId={project._id} type = "create" />}
+                  {isBidPopupOpen && <BidPopup close={closeBidPopup} userId={userDetails._id} projectId={project._id} type="create" />}
                 </>)}
                 {
                   userBid && userBid?.status === 'pending' && (<>
                     <SidebarAction icon={<HiOutlineChatAlt2 className="h-4 w-4" />} label="Update Your Bid" hoverClr={hoverClr} onClick={openBidPopup} />
-                    {isBidPopupOpen && <BidPopup close={closeBidPopup} userId={userDetails._id} projectId={project._id} type = "update" data={userBid} />}
+                    {isBidPopupOpen && <BidPopup close={closeBidPopup} userId={userDetails._id} projectId={project._id} type="update" data={userBid} />}
+                  </>)
+                }
+                {
+                  userBid && userBid?.status === 'accepted' && (<>
+                    <SidebarAction icon={<HiOutlineChatAlt2 className="h-4 w-4" />} label="Your bid has been accepted" hoverClr={hoverClr} />
+                  </>)
+                }
+                {
+                  userBid && userBid?.status === 'rejected' && (<>
+                    <SidebarAction icon={<HiOutlineChatAlt2 className="h-4 w-4" />} label="Your bid has been rejected" hoverClr={hoverClr} />
                   </>)
                 }
 
-                
+
               </>)}
-              
+
             </div>
 
             <div className={`space-y-4 rounded-lg border ${borderClr} p-4`}>
@@ -343,8 +356,8 @@ export default function ProjectDetails() {
               </button>
 
               <h3 className="font-medium mt-4">Project Progress</h3>
-              <ul className="space-y-1 text-sm">
-                {DUMMY_PROJECT.milestones.slice(0, 2).map((m) => (
+              {/* <ul className="space-y-1 text-sm">
+                {project.milestones.slice(0, 2).map((m) => (
                   <li key={m.id} className="flex items-center gap-2">
                     {m.done ? (
                       <span className="h-2.5 w-2.5 rounded-full bg-emerald-600" />
@@ -354,13 +367,13 @@ export default function ProjectDetails() {
                     {m.title}
                   </li>
                 ))}
-              </ul>
+              </ul> */}
 
-              <div className="rounded-lg border px-4 py-3 text-sm">
-                <p className="font-medium">{DUMMY_PROJECT.developer.name}</p>
-                <p className="text-gray-500">{DUMMY_PROJECT.developer.role}</p>
-                <p className="font-medium mt-2">{DUMMY_PROJECT.developer.rate}</p>
-              </div>
+              {/* <div className="rounded-lg border px-4 py-3 text-sm">
+                <p className="font-medium">{project.developer.name}</p>
+                <p className="text-gray-500">{project.developer.role}</p>
+                <p className="font-medium mt-2">{project.developer.rate}</p>
+              </div> */}
             </div>
           </aside>
         </div>
@@ -375,7 +388,7 @@ interface ActionProps {
   hoverClr: string;
   onClick?: () => void;
 }
-const SidebarAction: React.FC<ActionProps> = ({ icon, label, hoverClr , onClick}) => (
+const SidebarAction: React.FC<ActionProps> = ({ icon, label, hoverClr, onClick }) => (
   <button className={`flex w-full items-center gap-3 rounded-md px-4 py-2 text-sm ${hoverClr} cursor-pointer`} onClick={onClick}>
     {icon}
     {label}
@@ -391,24 +404,25 @@ interface BidProps {
 }
 const BidCard: React.FC<BidProps> = ({ bid, hoverClr, borderClr, expanded, setExpanded }) => {
 
+  console.log("Bid: ", bid)
   const handleBidAction = (bidId: number, action: string) => {
     console.log(bidId, action);
   }
 
   return (
     <div
-      key={bid.id}
+      key={bid._id}
       className={`flex flex-col rounded-lg border px-5 py-4 transition-all duration-200 hover:shadow-lg ${hoverClr} ${borderClr}`}
     >
       <div className={`flex items-center justify-between w-full gap-5 ${expanded ? "mb-4" : ""}`}>
-        <div className="flex items-center justify-between w-full cursor-pointer" onClick={() => setExpanded({ [bid.id]: !expanded[bid.id] })}>
+        <div className="flex items-center justify-between w-full cursor-pointer" onClick={() => setExpanded({ [bid._id]: !expanded[bid._id] })}>
           <div className="flex items-center gap-3">
             {bid.status === "Accepted" ? (
               <MdPlaylistAddCheck className="h-5 w-5 text-emerald-600" />
             ) : (
               <MdOutlinePlaylistAdd className="h-5 w-5 text-gray-400" />
             )}
-            <span className="font-medium text-lg">{bid.title}</span>
+            <span className="font-medium text-lg">{bid.description}</span>
           </div>
           <div className="flex items-center gap-2">
             {bid.status === "Pending" && <span className="text-sm text-yellow-600 font-semibold">Pending</span>}
@@ -425,20 +439,22 @@ const BidCard: React.FC<BidProps> = ({ bid, hoverClr, borderClr, expanded, setEx
               <DropdownMenuContent>
                 <DropdownMenuLabel>Bid Actions</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => handleBidAction(bid.id, "accept")} className="text-green-600 cursor-pointer">Accept</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleBidAction(bid.id, "reject")} className="text-red-600 cursor-pointer">Reject</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleBidAction(bid._id, "accept")} className="text-green-600 cursor-pointer">Accept</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleBidAction(bid._id, "reject")} className="text-red-600 cursor-pointer">Reject</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
           </button>
         </div>
       </div>
-      {expanded[bid.id] && (
+      {expanded[bid._id] && (
         <div className="mt-4 w-full text-left text-sm ">
           <p className="mb-1"><span className="font-semibold">Description:</span> {bid.description}</p>
-          <p className="mb-1"><span className="font-semibold">Amount:</span> {bid.amount}</p>
+          <p className="mb-1"><span className="font-semibold">Amount:</span> {bid.proposedBudget}</p>
           <p className="mb-1"><span className="font-semibold">Created At:</span> {bid.createdAt}</p>
-          <p className="mb-1"><span className="font-semibold">Developer ID:</span> {bid.developerId}</p>
+          {/* <p className="mb-1"><span className="font-semibold">User:</span>
+            <a href="/">User</a>
+          </p> */}
         </div>
       )}
     </div>
