@@ -15,7 +15,21 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useSelector } from "react-redux";
+import BidPopup from "./BidPopup";
 
+type BidStatus = "pending" | "rejected" | "accepted";
+export interface UserBidType{
+  "projectId": string;
+  "developerId": string;
+  "proposedBudget": number;
+  "timeline": string;
+  "description": string;
+  "status": BidStatus
+  "createdAt": Date;
+  "updatedAt": Date;
+  "__v": number;
+  "_id": number;
+}
 
 const DUMMY_PROJECT = {
   title: "Build a Mobile App",
@@ -75,13 +89,27 @@ export default function ProjectDetails() {
   const userDetails = useSelector((state: any) => state.auth.userDetails);
 
   const [showBid, setShowBid] = useState<boolean>(false);
-  const [showMilestones, setShowMilestones] = useState<boolean>(false)
+  const [showMilestones, setShowMilestones] = useState<boolean>(false);
+
+  const [userBid, setUserBid] = useState < UserBidType> ();
+
+  const [allBids, setAllBids] = useState<any>();
+  const [allMilestones, setAllMilestones] = useState();
+  const [isBidPopupOpen, setIsBidPopupOpen] = useState(false);
+
+  const openBidPopup = () => {
+    setIsBidPopupOpen(true);
+  };
+
+  const closeBidPopup = () => {
+    setIsBidPopupOpen(false);
+  };
 
 
 
   useEffect(() => {
     setLoading(true);
-    projectHttp.get(`projects/${id}`).then((res) => {
+    projectHttp.get(`project/${id}`).then((res) => {
       console.log(res.data.data);
       setProject(res.data.data);
       toast.success("Project details fetched successfully");
@@ -93,7 +121,6 @@ export default function ProjectDetails() {
     }).finally(() => {
       setLoading(false);
     })
-
   }, [])
 
   useEffect(() => {
@@ -102,7 +129,39 @@ export default function ProjectDetails() {
     } else {
       setShowBid(false);
     }
+
+    if (userDetails?._id === project?.clientId || userDetails?._id === project?.developerId) {
+      setShowMilestones(true);
+    }
+    else {
+      setShowMilestones(false);
+    }
+    console.log("project: ",project)
+    if (user_type === 'developer' && project) {
+      let projectId = String(project?._id)
+      console.log("projectId: ", projectId)
+      projectHttp(`/project/${projectId}/bid/dev`)
+        .then((res:any) => {
+          setUserBid(res.data.data);
+      })
+    }
+
   }, [user_type, userDetails, project]);
+
+
+  useEffect(() => {
+    if (showBid && activeTab==='bids') {
+      //get all the bids of the project
+    }
+    if (showMilestones && activeTab === 'milestones') {
+      //get all the milestones of the project.
+    }
+  }, [showBid, showMilestones, activeTab])
+
+
+  // const handleBidClick = () => {
+    
+  // }
 
 
   if (loading) {
@@ -143,7 +202,9 @@ export default function ProjectDetails() {
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
               className={
-                `${activeTab === tab.id ? "border-b-2 border-indigo-400 text-indigo-400 pb-2 cursor-pointer" : `pb-2 hover:text-indigo-400 ${subtleText} cursor-pointer`} ${tab.id === 'bids' && !showBid ? "hidden" : "show"}`
+                `${activeTab === tab.id ? "border-b-2 border-indigo-400 text-indigo-400 pb-2 cursor-pointer" : `pb-2 hover:text-indigo-400 ${subtleText} cursor-pointer`} ${tab.id === 'bids' && !showBid ? "hidden" : "show"}
+                ${tab.id === 'milestones' && !showMilestones ? "hidden" : "show"}
+                `
               }
             >
               {tab.label}
@@ -190,7 +251,7 @@ export default function ProjectDetails() {
                   </div>
                 </section>
 
-                <section>
+                <section className={`${showMilestones?"show":"hidden"}`}>
                   <div className="flex items-center justify-between mb-2">
                     <h2 className="text-lg font-semibold">Milestones</h2>
                     <span className="text-sm">
@@ -259,7 +320,18 @@ export default function ProjectDetails() {
                 </>
               )}
               {user_type === 'developer' && (<>
-                <SidebarAction icon={<HiOutlineChatAlt2 className="h-4 w-4" />} label="Bid on this project" hoverClr={hoverClr} />
+                {!userBid && (<>
+                  <SidebarAction icon={<HiOutlineChatAlt2 className="h-4 w-4" />} label="Bid on this project" hoverClr={hoverClr} onClick={openBidPopup} />
+                  {isBidPopupOpen && <BidPopup close={closeBidPopup} userId={userDetails._id} projectId={project._id} type = "create" />}
+                </>)}
+                {
+                  userBid && userBid?.status === 'pending' && (<>
+                    <SidebarAction icon={<HiOutlineChatAlt2 className="h-4 w-4" />} label="Update Your Bid" hoverClr={hoverClr} onClick={openBidPopup} />
+                    {isBidPopupOpen && <BidPopup close={closeBidPopup} userId={userDetails._id} projectId={project._id} type = "update" data={userBid} />}
+                  </>)
+                }
+
+                
               </>)}
               
             </div>
@@ -301,9 +373,10 @@ interface ActionProps {
   icon: React.ReactNode;
   label: string;
   hoverClr: string;
+  onClick?: () => void;
 }
-const SidebarAction: React.FC<ActionProps> = ({ icon, label, hoverClr }) => (
-  <button className={`flex w-full items-center gap-3 rounded-md px-4 py-2 text-sm ${hoverClr} cursor-pointer`}>
+const SidebarAction: React.FC<ActionProps> = ({ icon, label, hoverClr , onClick}) => (
+  <button className={`flex w-full items-center gap-3 rounded-md px-4 py-2 text-sm ${hoverClr} cursor-pointer`} onClick={onClick}>
     {icon}
     {label}
   </button>
