@@ -10,6 +10,8 @@ import { Loader2 } from "lucide-react";
 import { useSelector } from "react-redux";
 import BidPopup from "./BidPopup";
 import { BidCard } from "./BidCard";
+import { CreateMilestone } from "@/components/CreateMilestone";
+import { Milestones } from "../Milestone/Milestones";
 
 type BidStatus = "pending" | "rejected" | "accepted";
 export interface UserBidType {
@@ -86,6 +88,7 @@ export default function ProjectDetails() {
   const [allBids, setAllBids] = useState<BidType[]>();
   const [allMilestones, setAllMilestones] = useState<MilestoneType[]>();
   const [isBidPopupOpen, setIsBidPopupOpen] = useState(false);
+  const [openMilestoneMdoal, setOpenMilestoneMdoal] = useState(false);
 
   const openBidPopup = useCallback(() => {
     setIsBidPopupOpen(true);
@@ -93,6 +96,15 @@ export default function ProjectDetails() {
   const closeBidPopup = useCallback(() => {
     setIsBidPopupOpen(false);
   }, []);
+
+  const openCreateMilestoneModal = useCallback(() => {
+    setOpenMilestoneMdoal(true)
+  }, []);
+  
+  const closeCreateMilestoneModal = useCallback(() => {
+    setOpenMilestoneMdoal(false)
+  }, []);
+  
 
 
   useEffect(() => {
@@ -118,7 +130,7 @@ export default function ProjectDetails() {
       setShowBid(false);
     }
 
-    if (userDetails?._id === project?.clientId || userDetails?._id === project?.developerId) {
+    if (userDetails?._id === project?.clientId || userDetails?._id === project?.acceptedBid?.developerId) {
       setShowMilestones(true);
     }
     else {
@@ -300,24 +312,7 @@ export default function ProjectDetails() {
 
             {/* Milestones Tab */}
             {activeTab === "milestones" && (
-              <div className="mt-8 space-y-4">
-                {allMilestones && allMilestones.map((m) => (
-                  <div
-                    key={m._id}
-                    className={`flex items-center justify-between rounded-lg border px-5 py-4 cursor-pointer ${hoverClr} ${borderClr}`}
-                  >
-                    <div className="flex items-center gap-3">
-                      {m.status ==='completed' ? (
-                        <MdPlaylistAddCheck className="h-5 w-5 text-emerald-600" />
-                      ) : (
-                        <MdOutlinePlaylistAdd className="h-5 w-5 text-gray-400" />
-                      )}
-                      <span className="font-medium">{m.title}</span>
-                    </div>
-                    {m.status === "completed" && <span className="text-sm text-emerald-600">Completed</span>}
-                  </div>
-                ))}
-              </div>
+              <Milestones />
             )}
 
             {/* Bids Tab */}
@@ -338,7 +333,10 @@ export default function ProjectDetails() {
               {user_type === 'client' && (
                 <>
                   <SidebarAction icon={<MdEdit className="h-4 w-4" />} label="Edit Project" hoverClr={hoverClr} />
-                  <SidebarAction icon={<MdOutlinePlaylistAdd className="h-4 w-4" />} label="Create Milestone" hoverClr={hoverClr} />
+                  <SidebarAction icon={<MdOutlinePlaylistAdd className="h-4 w-4" />} label="Create Milestone" hoverClr={hoverClr} onClick={openCreateMilestoneModal} />
+                  {openMilestoneMdoal && (
+                    <CreateMilestone onClose={closeCreateMilestoneModal} />
+                  )}
                   <SidebarAction icon={<HiOutlineChatAlt2 className="h-4 w-4" />} label="View Proposal" hoverClr={hoverClr} />
                 </>
               )}

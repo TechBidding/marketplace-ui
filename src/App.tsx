@@ -21,6 +21,7 @@ import { Profile } from './pages/Profile'
 import { Project } from './pages/Project/Project'
 import CreateProjectPage from './pages/Project/CreateProject'
 import  ProjectDetails  from './pages/Project/ProjectDetails'
+import {MilestoneDetails} from './pages/Milestone/MilestoneDetails'
 
 enum UserTypes {
   developer = "developer",
@@ -121,6 +122,11 @@ function App() {
                         <ProjectDetails />
                       </Layout>
                     } />
+                    <Route path="/project/:id/milestone/:milestoneId" element={
+                      <Layout>
+                        <MilestoneDetails />
+                      </Layout>
+                    } />
                 </>
               )}
               {user_type === UserTypes.client && (
@@ -151,6 +157,11 @@ function App() {
                     <Route path="/project/:id" element={
                       <Layout>
                         <ProjectDetails />
+                      </Layout>
+                    } />
+                    <Route path="/project/:id/milestone/:milestoneId" element={
+                      <Layout>
+                        <MilestoneDetails />
                       </Layout>
                     } />
                 </>
