@@ -162,8 +162,6 @@ export const MilestoneDetails = () => {
     const userType = useSelector((state: { auth: AuthStateState }) => state.auth.userType);
     const userDetails = useSelector((state: { auth: AuthStateState }) => state.auth.userDetails);
 
-    console.log("User Type:", userType);
-    console.log("User Details:", userDetails);
 
     useEffect(() => {
         fetchMilestoneData();
@@ -177,27 +175,21 @@ export const MilestoneDetails = () => {
             const milestoneRes = await projectHttp.get(`project/${id}/milestone/${milestoneId}`);
             const milestoneData = milestoneRes.data.data.milestone;
             const escrowData = milestoneRes.data.data.escrow;
-            console.log("Milestone Data:", milestoneRes.data.data);
-            console.log('API Response:', {
-                milestone: milestoneData,
-                escrow: escrowData,
-                fullResponse: milestoneRes.data.data
-            });
 
             setMilestone(milestoneData);
             setEscrowData(escrowData);
 
             // Fetch payment status
             try {
-                const statusRes = await projectHttp.get(`/payments/status/${milestoneId}`);
-                console.log("Payment Status Response:", statusRes.data.data);
+                const statusRes = await projectHttp.post(`/payments/status`, {
+                    milestoneId: milestoneId
+                });
                 if (statusRes.data.success) {
                     setPaymentStatus(statusRes.data.data);
 
                     // IMPORTANT: If escrow data exists in payment status but not in milestone, use it
                     // This happens when milestone endpoint doesn't return escrow data
                     if (statusRes.data.data?.escrow && !escrowData) {
-                        console.log("Using escrow data from payment status endpoint");
                         setEscrowData(statusRes.data.data.escrow);
                     }
 
@@ -313,23 +305,6 @@ export const MilestoneDetails = () => {
     // Check if payment is held in escrow (any escrow status means payment is done)
     const isPaymentHeld = Boolean(escrowData && (escrowData.status === 'held' || escrowData.status === 'released'));
     const isPaymentCompleted = milestone.status === 'paid' || escrowData?.status === 'released';
-
-    // Debug logging to understand payment states
-    if (!loading) {
-        console.log("Escrow Data:", escrowData);
-        console.log('Payment States:', {
-            milestoneStatus: milestone.status,
-            escrowStatus: escrowData?.status,
-            isPaymentHeld,
-            isPaymentCompleted,
-            isClient,
-            isDeveloper,
-            hasClientSecret: !!clientSecret,
-            showPaymentSection: isClient && !isPaymentHeld && !isPaymentCompleted,
-            showPaymentHeld: isClient && isPaymentHeld && !isPaymentCompleted,
-            showPaymentDetails: (isClient || isDeveloper) && isPaymentCompleted && escrowData
-        });
-    }
 
     return (
         <div className={`min-h-screen ${bgPage} py-8 px-4`}>

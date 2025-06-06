@@ -133,11 +133,9 @@ export default function ProjectDetails() {
   useEffect(() => {
     setLoading(true);
     projectHttp.get(`project/${id}`).then((res) => {
-      console.log(res.data.data);
       setProject(res.data.data);
       toast.success("Project details fetched successfully");
-    }).catch((err) => {
-      console.log(err);
+    }).catch((err) => { 
       toast.error("Error fetching project details", {
         description: err.response.data.message
       });

@@ -64,7 +64,6 @@ export const CreateMilestone = ({ onClose }: CreateMilestoneProps) => {
 
     async function onSubmit(data: ICreateMilestoneSchema) {
         try {
-            console.log("data: ", data)
             await projectHttp.post(`project/${params.id}/milestone`, data);
             toast.success("Milestone created successfully");
             onClose();

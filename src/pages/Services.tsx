@@ -60,11 +60,9 @@ export const Services = () => {
             .then((res) => {
                 if (res.status === 200) {
                     setServicesList(res.data);
-                    console.log("res.data", res.data);
                 }
             })
             .catch((err) => {
-                console.log(err);
                 toast.error("Failed to load services");
             })
             .finally(() => {
