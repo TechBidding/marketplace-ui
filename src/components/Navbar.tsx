@@ -2,8 +2,8 @@ import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useDispatch, useSelector } from "react-redux";
 import { NavBarList } from "@/utility/contants";
-import { TbLayoutSidebarLeftExpandFilled } from "react-icons/tb";
-import { TbLayoutSidebarRightExpandFilled } from "react-icons/tb";
+import { TbLayoutSidebarLeftExpandFilled, TbLayoutSidebarRightExpandFilled } from "react-icons/tb";
+import { HiOutlineLogout, HiOutlineUser, HiOutlineCog } from "react-icons/hi";
 import { ModeToggle } from "./mode-toggle";
 import { useTheme } from "./theme-provider";
 import {
@@ -19,20 +19,19 @@ import { logout } from "@/store/AuthSlice";
 import { toast } from "sonner";
 import { Link, useNavigate } from "react-router-dom";
 
-
-
-
 export const Navbar = () => {
     const [expanded, setExpanded] = useState<boolean>(false);
     const userDetails = useSelector((state: any) => state.auth.userDetails);
     const dispatch = useDispatch();
     const { theme } = useTheme();
     const navigate = useNavigate()
+    const isDark = theme === "dark"
+
     const handleLogout = () => {
         userHttp.post('developer/logout').then(() => {
-                dispatch(logout())
-                window.location.href = `${window.location.pathname}/signin`;
-                toast.success('Logged out successfully');
+            dispatch(logout())
+            window.location.href = `${window.location.pathname}/signin`;
+            toast.success('Logged out successfully');
         }).catch((err) => {
             toast.error('Error occurred while logging out', {
                 description: err.response.data.message,
@@ -43,116 +42,164 @@ export const Navbar = () => {
     const handleProfile = () => {
         navigate(`/user/${userDetails.userName}`)
     }
-    
 
     return (
-        <>
-            <nav className={`p-4 flex flex-col ${theme === 'dark' || theme === 'system' ? 'bg-gray-800 text-white' : 'bg-gray-300 text-gray-800'}`}
-                style={{
-                    width: expanded ? '200px' : '60px',
-                    height: '100vh',
-                    transition: 'width 0.3s ease-in-out',
-                    overflow: 'hidden',
-                    position: 'fixed',
-                    boxShadow: expanded ? '0 4px 8px rgba(0, 0, 0, 0.2)' : 'none',
-                    borderRadius: expanded ? '0 0 0 10px' : '0 0 10px 0',
-                    transitionDuration: '0.3s',
-                    transitionTimingFunction: 'ease-in-out',
-                    transitionProperty: 'width, padding, background-color',
-                    transitionDelay: '0s',
-                    zIndex: 1,
-                }}>
-                
-                {/* Logo */}
-                <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                        <div className="flex flex-row items-center">
-                            <Avatar>
-                                <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-                                <AvatarFallback>CN</AvatarFallback>
-                            </Avatar>
-                            {expanded && (
-                                <span className=" ml-2 text-lg font-bold">Marketplace</span>
-                            )}
+        <nav className={`fixed left-0 top-0 h-screen z-50 transition-all duration-300 ease-in-out ${expanded ? 'w-64' : 'w-20'
+            } ${isDark
+                ? 'bg-gray-900/95 backdrop-blur-xl border-r border-gray-800'
+                : 'bg-white/95 backdrop-blur-xl border-r border-gray-200'
+            } shadow-xl`}>
+            <div className="flex flex-col h-full p-4">
+                {/* Logo Section */}
+                <div className="flex items-center gap-3 mb-8 px-2">
+                    <div className="w-10 h-10 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                        <span className="text-white font-bold text-lg">M</span>
+                    </div>
+                    {expanded && (
+                        <div className="flex flex-col">
+                            <span className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                                Marketplace
+                            </span>
+                            <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                                Professional Platform
+                            </span>
                         </div>
-                    </div>
-                    
-
-                    {/* Navbar List */}
-                    <div>
-                        <ul className="flex flex-col space-y-4 mt-20 gap-5">
-                            {NavBarList.map((item, index) => (
-                                <li key={index}>
-                                    <Link to={item.link} className="hover:text-gray-400">
-                                        {expanded ? (
-                                            <div className="flex items-center justify-between w-full">
-                                                <div className="flex justify-center items-center gap-2">
-                                                    <item.icon className="w-5 h-5" />
-                                                    <span>{item.name}</span>
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <div className="flex justify-center">
-                                                <item.icon className="w-5 h-5" />
-                                            </div>
-                                        )}
-                                    </Link>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-
-
-
-                </div>
-                
-                {/* Toggle */}
-                <div className={`mt-auto pb-4 mr-0.7 flex items-center ${expanded ? 'flex-row justify-end ' : 'flex-col'} gap-2`}>
-                    <div className={`flex items-center ${expanded ? 'mr-auto' : 'justify-center'} ${theme === 'dark' ? 'text-white' : 'background-gray-800'} cursor-pointer`}>
-                        <ModeToggle />
-                    </div>
-                    <button onClick={() => setExpanded(!expanded)} className={`flex items-center justify-center w-10 h-10 rounded-full transition duration-300 ${theme === 'light' ? "bg-gray-300" : "bg-gray-700"} cursor-pointer `}>
-                        {expanded ? (
-                            <TbLayoutSidebarRightExpandFilled className="w-5 h-5" />
-                        ) : (
-                            <TbLayoutSidebarLeftExpandFilled className="w-5 h-5" />
-                        )}
-                    </button>
+                    )}
                 </div>
 
-                {/* Bottom section */}
-                <div>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger className="mt-auto pt-4  border-t-2 border-gray-400 flex items-center flex-row gap-4 cursor-pointer">
-                            <div className="mr-2">
-                                <Avatar>
-                                    <AvatarImage src={userDetails?.profilePicture || "https://github.com/shadcn.png"} alt="profile picture" />
-                                    <AvatarFallback>CN</AvatarFallback>
-                                </Avatar>
-                            </div>
-                            {
-                                expanded && (
-                                    <div className="flex flex-col ">
-                                        <div>
-                                            <span className="text-s font-bold">{userDetails?.userName}</span>
-                                        </div>
-                                        <div>
-                                            <span className={`text-s ${theme==='light' ? 'text-gray-700': 'text-gray-400'}`}>{userDetails?.name}</span>
-                                        </div>
+                {/* Navigation Items */}
+                <div className="flex-1">
+                    <ul className="space-y-2">
+                        {NavBarList.map((item, index) => (
+                            <li key={index}>
+                                <Link
+                                    to={item.link}
+                                    className={`group flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 ${isDark
+                                            ? 'text-gray-300 hover:text-white hover:bg-gray-800/60'
+                                            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100/60'
+                                        } relative overflow-hidden`}
+                                >
+                                    <div className={`p-2 rounded-lg transition-all duration-200 ${isDark
+                                            ? 'bg-gray-800/50 group-hover:bg-indigo-600/20'
+                                            : 'bg-gray-100/50 group-hover:bg-indigo-100'
+                                        }`}>
+                                        <item.icon className={`w-5 h-5 transition-colors duration-200 ${isDark ? 'group-hover:text-indigo-400' : 'group-hover:text-indigo-600'
+                                            }`} />
                                     </div>
-                                )
-                            }
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                            <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem className="cursor-pointer" onClick={handleProfile} >Profile</DropdownMenuItem>
-                            <DropdownMenuItem className="cursor-pointer" onClick={handleLogout}>Logout</DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                                    {expanded && (
+                                        <span className="font-medium whitespace-nowrap">
+                                            {item.name}
+                                        </span>
+                                    )}
+
+                                    {/* Hover effect */}
+                                    <div className="absolute inset-0 bg-gradient-to-r from-indigo-600/10 to-purple-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-xl"></div>
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
                 </div>
 
-            </nav>
-        </>
+                {/* Bottom Controls */}
+                <div className="space-y-4">
+                    {/* Theme Toggle & Expand Button */}
+                    <div className={`flex items-center ${expanded ? 'justify-between' : 'flex-col gap-3'}`}>
+                        <div className={`${expanded ? '' : 'order-2'}`}>
+                            <ModeToggle />
+                        </div>
+                        <button
+                            onClick={() => setExpanded(!expanded)}
+                            className={`p-2 rounded-lg transition-all duration-200 ${isDark
+                                    ? 'bg-gray-800/50 hover:bg-gray-700/50 text-gray-300 hover:text-white'
+                                    : 'bg-gray-100/50 hover:bg-gray-200/50 text-gray-600 hover:text-gray-900'
+                                } ${expanded ? 'order-2' : 'order-1'}`}
+                        >
+                            {expanded ? (
+                                <TbLayoutSidebarRightExpandFilled className="w-5 h-5" />
+                            ) : (
+                                <TbLayoutSidebarLeftExpandFilled className="w-5 h-5" />
+                            )}
+                        </button>
+                    </div>
+
+                    {/* User Profile Section */}
+                    <div className={`border-t ${isDark ? 'border-gray-800' : 'border-gray-200'} pt-4`}>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-200 ${isDark
+                                    ? 'hover:bg-gray-800/60 text-gray-300 hover:text-white'
+                                    : 'hover:bg-gray-100/60 text-gray-600 hover:text-gray-900'
+                                } focus:outline-none focus:ring-2 focus:ring-indigo-500/50`}>
+                                <Avatar className="w-10 h-10 ring-2 ring-white/20 shadow-lg">
+                                    <AvatarImage
+                                        src={userDetails?.profilePicture || "https://github.com/shadcn.png"}
+                                        alt="Profile"
+                                        className="object-cover"
+                                    />
+                                    <AvatarFallback className="bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-semibold">
+                                        {userDetails?.name?.charAt(0)?.toUpperCase() || 'U'}
+                                    </AvatarFallback>
+                                </Avatar>
+                                {expanded && (
+                                    <div className="flex-1 text-left min-w-0">
+                                        <p className="font-semibold truncate">
+                                            {userDetails?.userName || 'User'}
+                                        </p>
+                                        <p className={`text-sm truncate ${isDark ? 'text-gray-400' : 'text-gray-500'
+                                            }`}>
+                                            {userDetails?.name || 'Full Name'}
+                                        </p>
+                                    </div>
+                                )}
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent
+                                className={`w-56 ${isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'} shadow-xl`}
+                                align="end"
+                                side="right"
+                            >
+                                <DropdownMenuLabel className="flex items-center gap-3 p-3">
+                                    <Avatar className="w-8 h-8">
+                                        <AvatarImage src={userDetails?.profilePicture || "https://github.com/shadcn.png"} />
+                                        <AvatarFallback className="bg-gradient-to-br from-indigo-500 to-purple-600 text-white text-sm">
+                                            {userDetails?.name?.charAt(0)?.toUpperCase() || 'U'}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="font-medium truncate">{userDetails?.name || 'User'}</p>
+                                        <p className={`text-sm truncate ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                                            @{userDetails?.userName || 'username'}
+                                        </p>
+                                    </div>
+                                </DropdownMenuLabel>
+                                <DropdownMenuSeparator className={isDark ? 'bg-gray-800' : 'bg-gray-200'} />
+                                <DropdownMenuItem
+                                    className={`cursor-pointer flex items-center gap-3 p-3 ${isDark ? 'hover:bg-gray-800 focus:bg-gray-800' : 'hover:bg-gray-100 focus:bg-gray-100'
+                                        }`}
+                                    onClick={handleProfile}
+                                >
+                                    <HiOutlineUser className="w-4 h-4" />
+                                    <span>View Profile</span>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    className={`cursor-pointer flex items-center gap-3 p-3 ${isDark ? 'hover:bg-gray-800 focus:bg-gray-800' : 'hover:bg-gray-100 focus:bg-gray-100'
+                                        }`}
+                                >
+                                    <HiOutlineCog className="w-4 h-4" />
+                                    <span>Settings</span>
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator className={isDark ? 'bg-gray-800' : 'bg-gray-200'} />
+                                <DropdownMenuItem
+                                    className={`cursor-pointer flex items-center gap-3 p-3 text-red-600 dark:text-red-400 ${isDark ? 'hover:bg-red-900/20 focus:bg-red-900/20' : 'hover:bg-red-50 focus:bg-red-50'
+                                        }`}
+                                    onClick={handleLogout}
+                                >
+                                    <HiOutlineLogout className="w-4 h-4" />
+                                    <span>Logout</span>
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+                </div>
+            </div>
+        </nav>
     )
 }

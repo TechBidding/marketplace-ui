@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -7,7 +7,7 @@ import { ServiceEnum, SkillEnum } from "../../utility/contants";
 import { createProjectSchema } from "@/utility/Schema/createProjectSchema";
 import { projectHttp } from "@/utility/api";
 import { toast } from "sonner";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
     HiOutlineClipboardList,
     HiOutlineCurrencyDollar,
@@ -16,12 +16,13 @@ import {
     HiOutlinePlus,
     HiOutlineTrash,
     HiOutlineTag,
-    HiOutlineCode
+    HiOutlineCode,
+    HiOutlineSave
 } from "react-icons/hi";
 import { FaProjectDiagram, FaTools } from "react-icons/fa";
 import { Loader2 } from "lucide-react";
 
-export type ICreateProjectSchema = z.infer<typeof createProjectSchema>;
+export type IUpdateProjectSchema = z.infer<typeof createProjectSchema>;
 
 interface FormFieldProps extends React.HTMLAttributes<HTMLDivElement> {
     label: string;
@@ -55,16 +56,22 @@ const FormField: React.FC<FormFieldProps> = ({
     </div>
 );
 
-export default function CreateProjectPage() {
+export default function UpdateProjectPage() {
     const { theme } = useTheme();
     const isDark = theme === "dark";
+    const navigate = useNavigate();
+    const { id } = useParams();
+
+    const [loading, setLoading] = useState(true);
+    const [project, setProject] = useState<any>(null);
 
     const {
         register,
         control,
         handleSubmit,
+        setValue,
         formState: { errors, isSubmitting },
-    } = useForm<ICreateProjectSchema>({
+    } = useForm<IUpdateProjectSchema>({
         resolver: zodResolver(createProjectSchema),
         defaultValues: {
             serviceType: [],
@@ -80,7 +87,6 @@ export default function CreateProjectPage() {
     const [image, setImage] = useState<string | null>(null);
     const [file, setFile] = useState<File | null>(null);
     const handleImageClick = () => imgRef.current?.click();
-    const navigate = useNavigate();
 
     /* ----------------------- theme utilities -------------------------- */
     const bgPage = isDark ? "bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800" : "bg-gradient-to-br from-gray-50 via-white to-gray-100";
@@ -89,14 +95,44 @@ export default function CreateProjectPage() {
     const borderClr = isDark ? "border-gray-600/50" : "border-gray-200/50";
     const textClr = isDark ? "text-gray-100" : "text-gray-900";
     const subtleText = isDark ? "text-gray-400" : "text-gray-600";
-    const cardBg = isDark ? "bg-gray-800/30" : "bg-white/60";
 
-    async function onSubmit(data: ICreateProjectSchema) {
-        if (!file) {
-            toast.error("Please select a project image");
-            return;
+    // Load existing project data
+    useEffect(() => {
+        if (id) {
+            setLoading(true);
+            projectHttp.get(`project/${id}`)
+                .then((res) => {
+                    const projectData = res.data.data;
+                    setProject(projectData);
+
+                    // Populate form with existing data
+                    setValue("title", projectData.title);
+                    setValue("description", projectData.description);
+                    setValue("pricing.amount", projectData.pricing.amount);
+                    setValue("pricing.currency", projectData.pricing.currency);
+                    setValue("deadline", new Date(projectData.deadline));
+                    setValue("serviceType", projectData.serviceType);
+                    setValue("requiredSkills", projectData.requiredSkills);
+                    setValue("requirements", projectData.requirements || []);
+
+                    // Set existing image
+                    if (projectData.image) {
+                        setImage(projectData.image);
+                    }
+                })
+                .catch((err) => {
+                    toast.error("Failed to load project", {
+                        description: err.response?.data?.message || "Project not found"
+                    });
+                    navigate("/projects");
+                })
+                .finally(() => {
+                    setLoading(false);
+                });
         }
+    }, [id, setValue, navigate]);
 
+    async function onSubmit(data: IUpdateProjectSchema) {
         const fd = new FormData();
 
         /* -------------- primitives ---------------- */
@@ -114,18 +150,19 @@ export default function CreateProjectPage() {
         data.requirements?.forEach(r => fd.append("requirements", r));
         data.projectIds?.forEach(id => fd.append("projectIds", id));
 
-        /* -------------- file ---------------------- */
-        fd.append("image", file);
+        /* -------------- file (optional for update) ---------------------- */
+        if (file) {
+            fd.append("image", file);
+        }
 
         try {
-            const res = await projectHttp.post("/projects", fd);
-            const resData = res.data;
-            navigate(`/project/${resData.data._id}`);
-            toast.success("Project created successfully! 🎉", {
-                description: "Your project is now live and ready for bids."
+            const res = await projectHttp.put(`/projects/${id}`, fd);
+            navigate(`/project/${id}`);
+            toast.success("Project updated successfully! ✨", {
+                description: "Your changes have been saved."
             });
         } catch (err: any) {
-            toast.error("Failed to create project", {
+            toast.error("Failed to update project", {
                 description: err.response?.data?.message || "Please try again"
             });
         }
@@ -134,22 +171,33 @@ export default function CreateProjectPage() {
     const serviceOptions = Object.values(ServiceEnum);
     const skillOptions = Object.values(SkillEnum);
 
+    if (loading) {
+        return (
+            <div className={`min-h-screen ${bgPage} flex justify-center items-center`}>
+                <div className="text-center">
+                    <Loader2 className="h-12 w-12 animate-spin text-indigo-600 mx-auto mb-4" />
+                    <p className={`text-lg ${subtleText}`}>Loading project details...</p>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className={`min-h-screen ${bgPage} py-8 px-4`}>
             <div className="max-w-5xl mx-auto">
                 {/* Hero Header */}
-                <div className={`relative overflow-hidden bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600 rounded-3xl mb-8 px-8 py-12`}>
+                <div className={`relative overflow-hidden bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 rounded-3xl mb-8 px-8 py-12`}>
                     <div className="absolute inset-0 bg-black/10"></div>
                     <div className="relative z-10">
                         <div className="flex items-center gap-3 mb-4">
                             <FaProjectDiagram className="h-8 w-8 text-white/80" />
-                            <span className="text-white/80 font-medium">New Project</span>
+                            <span className="text-white/80 font-medium">Edit Project</span>
                         </div>
                         <h1 className="text-4xl lg:text-5xl font-bold text-white mb-4">
-                            Create Your Project
+                            Update Your Project
                         </h1>
                         <p className="text-white/90 text-lg max-w-2xl">
-                            Tell us about your project and connect with talented developers ready to bring your vision to life.
+                            Make changes to your project details and keep your listing up to date.
                         </p>
                     </div>
                     {/* Decorative elements */}
@@ -167,7 +215,7 @@ export default function CreateProjectPage() {
                                 </div>
                                 <h2 className={`text-xl font-bold ${textClr}`}>Basic Information</h2>
                             </div>
-                            <p className={`mt-2 ${subtleText}`}>Start with the fundamentals of your project</p>
+                            <p className={`mt-2 ${subtleText}`}>Update the core details of your project</p>
                         </div>
 
                         <div className="p-8 space-y-6">
@@ -182,7 +230,7 @@ export default function CreateProjectPage() {
                                     id="title"
                                     type="text"
                                     {...register("title")}
-                                    className={`w-full rounded-xl px-4 py-3 border ${borderClr} ${inputBg} focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition-all`}
+                                    className={`w-full rounded-xl px-4 py-3 border ${borderClr} ${inputBg} focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition-all`}
                                     placeholder="e.g., Build a Modern E‑commerce Platform"
                                 />
                             </FormField>
@@ -198,7 +246,7 @@ export default function CreateProjectPage() {
                                     id="description"
                                     rows={5}
                                     {...register("description")}
-                                    className={`w-full rounded-xl px-4 py-3 border ${borderClr} ${inputBg} focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition-all resize-none`}
+                                    className={`w-full rounded-xl px-4 py-3 border ${borderClr} ${inputBg} focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition-all resize-none`}
                                     placeholder="Describe your project in detail. What are your goals, requirements, and expectations?"
                                 />
                             </FormField>
@@ -219,7 +267,7 @@ export default function CreateProjectPage() {
                                             type="number"
                                             step="0.01"
                                             {...register("pricing.amount", { valueAsNumber: true })}
-                                            className={`w-full rounded-xl pl-10 pr-4 py-3 border ${borderClr} ${inputBg} focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition-all`}
+                                            className={`w-full rounded-xl pl-10 pr-4 py-3 border ${borderClr} ${inputBg} focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition-all`}
                                             placeholder="Enter your budget"
                                         />
                                     </div>
@@ -232,7 +280,7 @@ export default function CreateProjectPage() {
                                     <select
                                         id="currency"
                                         {...register("pricing.currency")}
-                                        className={`w-full rounded-xl px-4 py-3 border ${borderClr} ${inputBg} focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition-all`}
+                                        className={`w-full rounded-xl px-4 py-3 border ${borderClr} ${inputBg} focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition-all`}
                                     >
                                         <option value="">Select Currency</option>
                                         {createProjectSchema.shape.pricing.shape.currency.options.map((cur) => (
@@ -253,7 +301,7 @@ export default function CreateProjectPage() {
                                 </div>
                                 <h2 className={`text-xl font-bold ${textClr}`}>Skills & Services</h2>
                             </div>
-                            <p className={`mt-2 ${subtleText}`}>Define what expertise you're looking for</p>
+                            <p className={`mt-2 ${subtleText}`}>Update what expertise you're looking for</p>
                         </div>
 
                         <div className="p-8 space-y-8">
@@ -265,12 +313,12 @@ export default function CreateProjectPage() {
                             >
                                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                                     {serviceOptions.map((svc) => (
-                                        <label key={svc} className={`flex items-center gap-3 p-4 border ${borderClr} rounded-xl cursor-pointer hover:bg-indigo-50 dark:hover:bg-gray-700/50 transition-colors`}>
+                                        <label key={svc} className={`flex items-center gap-3 p-4 border ${borderClr} rounded-xl cursor-pointer hover:bg-emerald-50 dark:hover:bg-gray-700/50 transition-colors`}>
                                             <input
                                                 type="checkbox"
                                                 value={svc}
                                                 {...register("serviceType")}
-                                                className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                                                className="w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
                                             />
                                             <span className={`text-sm font-medium ${textClr}`}>{svc}</span>
                                         </label>
@@ -286,12 +334,12 @@ export default function CreateProjectPage() {
                             >
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                                     {skillOptions.map((skill) => (
-                                        <label key={skill} className={`flex items-center gap-3 p-4 border ${borderClr} rounded-xl cursor-pointer hover:bg-indigo-50 dark:hover:bg-gray-700/50 transition-colors`}>
+                                        <label key={skill} className={`flex items-center gap-3 p-4 border ${borderClr} rounded-xl cursor-pointer hover:bg-emerald-50 dark:hover:bg-gray-700/50 transition-colors`}>
                                             <input
                                                 type="checkbox"
                                                 value={skill}
                                                 {...register("requiredSkills")}
-                                                className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                                                className="w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
                                             />
                                             <span className={`text-sm font-medium ${textClr}`}>{skill}</span>
                                         </label>
@@ -310,7 +358,7 @@ export default function CreateProjectPage() {
                                             <input
                                                 type="text"
                                                 {...register(`requirements.${idx}` as const)}
-                                                className={`flex-1 rounded-xl px-4 py-3 border ${borderClr} ${inputBg} focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition-all`}
+                                                className={`flex-1 rounded-xl px-4 py-3 border ${borderClr} ${inputBg} focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition-all`}
                                                 placeholder={`Requirement #${idx + 1}`}
                                             />
                                             <button
@@ -325,7 +373,7 @@ export default function CreateProjectPage() {
                                     <button
                                         type="button"
                                         onClick={() => append("")}
-                                        className="flex items-center gap-2 px-4 py-3 border-2 border-dashed border-indigo-300 dark:border-indigo-700 rounded-xl text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-colors"
+                                        className="flex items-center gap-2 px-4 py-3 border-2 border-dashed border-emerald-300 dark:border-emerald-700 rounded-xl text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition-colors"
                                     >
                                         <HiOutlinePlus className="h-4 w-4" />
                                         Add Requirement
@@ -344,7 +392,7 @@ export default function CreateProjectPage() {
                                 </div>
                                 <h2 className={`text-xl font-bold ${textClr}`}>Timeline & Media</h2>
                             </div>
-                            <p className={`mt-2 ${subtleText}`}>Set your deadline and add project visuals</p>
+                            <p className={`mt-2 ${subtleText}`}>Update your deadline and project visuals</p>
                         </div>
 
                         <div className="p-8 space-y-6">
@@ -358,7 +406,7 @@ export default function CreateProjectPage() {
                                     id="deadline"
                                     type="date"
                                     {...register("deadline", { valueAsDate: true })}
-                                    className={`w-full rounded-xl px-4 py-3 border ${borderClr} ${inputBg} focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition-all`}
+                                    className={`w-full rounded-xl px-4 py-3 border ${borderClr} ${inputBg} focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition-all`}
                                 />
                             </FormField>
 
@@ -371,7 +419,7 @@ export default function CreateProjectPage() {
                                     tabIndex={0}
                                     onClick={handleImageClick}
                                     onKeyDown={(e) => e.key === "Enter" && handleImageClick()}
-                                    className={`relative w-full h-64 flex items-center justify-center overflow-hidden rounded-xl border-2 border-dashed ${borderClr} ${inputBg} cursor-pointer hover:border-indigo-400 transition-colors group`}
+                                    className={`relative w-full h-64 flex items-center justify-center overflow-hidden rounded-xl border-2 border-dashed ${borderClr} ${inputBg} cursor-pointer hover:border-emerald-400 transition-colors group`}
                                 >
                                     <input
                                         ref={imgRef}
@@ -403,22 +451,29 @@ export default function CreateProjectPage() {
                         </div>
                     </div>
 
-                    {/* Submit Button */}
-                    <div className="flex justify-end pt-4">
+                    {/* Action Buttons */}
+                    <div className="flex justify-end gap-4 pt-4">
+                        <button
+                            type="button"
+                            onClick={() => navigate(`/project/${id}`)}
+                            className={`px-6 py-3 border ${borderClr} rounded-xl font-medium transition-colors ${isDark ? 'hover:bg-gray-700/50' : 'hover:bg-gray-50'} ${textClr}`}
+                        >
+                            Cancel
+                        </button>
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                            className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                         >
                             {isSubmitting ? (
                                 <>
                                     <Loader2 className="h-5 w-5 animate-spin" />
-                                    Creating Project...
+                                    Updating Project...
                                 </>
                             ) : (
                                 <>
-                                    <FaProjectDiagram className="h-5 w-5" />
-                                    Create Project
+                                    <HiOutlineSave className="h-5 w-5" />
+                                    Update Project
                                 </>
                             )}
                         </button>
@@ -427,5 +482,4 @@ export default function CreateProjectPage() {
             </div>
         </div>
     );
-}
-
+} 

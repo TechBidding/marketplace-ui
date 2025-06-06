@@ -20,8 +20,9 @@ import { Services } from './pages/Services'
 import { Profile } from './pages/Profile'
 import { Project } from './pages/Project/Project'
 import CreateProjectPage from './pages/Project/CreateProject'
-import  ProjectDetails  from './pages/Project/ProjectDetails'
-import {MilestoneDetails} from './pages/Milestone/MilestoneDetails'
+import ProjectDetails from './pages/Project/ProjectDetails'
+import UpdateProjectPage from './pages/Project/UpdateProject'
+import { MilestoneDetails } from './pages/Milestone/MilestoneDetails'
 
 enum UserTypes {
   developer = "developer",
@@ -103,30 +104,35 @@ function App() {
                       <DevHome />
                     </Layout>
                   } />
-                    
-                    <Route path="/dev/services" element={
-                      <Layout>
-                        <Services />
-                      </Layout>
-                    } />
-                    
-                    <Route path="/dev/signin" element={<Navigate to="/dev" replace />} />
-                    <Route path="/dev/signup" element={<Navigate to="/dev" replace />} />
-                    <Route path="/user/:username" element={
-                      <Layout>
-                        <Profile />
-                      </Layout>
-                    } />
-                    <Route path="/project/:id" element={
-                      <Layout>
-                        <ProjectDetails />
-                      </Layout>
-                    } />
-                    <Route path="/project/:id/milestone/:milestoneId" element={
-                      <Layout>
-                        <MilestoneDetails />
-                      </Layout>
-                    } />
+
+                  <Route path="/dev/services" element={
+                    <Layout>
+                      <Services />
+                    </Layout>
+                  } />
+
+                  <Route path="/dev/signin" element={<Navigate to="/dev" replace />} />
+                  <Route path="/dev/signup" element={<Navigate to="/dev" replace />} />
+                  <Route path="/user/:username" element={
+                    <Layout>
+                      <Profile />
+                    </Layout>
+                  } />
+                  <Route path="/project/:id" element={
+                    <Layout>
+                      <ProjectDetails />
+                    </Layout>
+                  } />
+                  <Route path="/project/:id/edit" element={
+                    <Layout>
+                      <UpdateProjectPage />
+                    </Layout>
+                  } />
+                  <Route path="/project/:id/milestone/:milestoneId" element={
+                    <Layout>
+                      <MilestoneDetails />
+                    </Layout>
+                  } />
                 </>
               )}
               {user_type === UserTypes.client && (
@@ -136,34 +142,39 @@ function App() {
                       <ClientHome />
                     </Layout>
                   } />
-                    
-                    <Route path="/client/signin" element={<Navigate to="/client" replace />} />
-                    <Route path="/client/signup" element={<Navigate to="/client" replace />} />
-                    <Route path="/user/:username" element={
-                      <Layout>
-                        <Profile />
-                      </Layout>
-                    } />
-                    <Route path="/project" element={
-                      <Layout>
-                        <Project />
-                      </Layout>
-                    } />
-                    <Route path="/project/create" element={
-                      <Layout>
-                        <CreateProjectPage />
-                      </Layout>
-                    } />
-                    <Route path="/project/:id" element={
-                      <Layout>
-                        <ProjectDetails />
-                      </Layout>
-                    } />
-                    <Route path="/project/:id/milestone/:milestoneId" element={
-                      <Layout>
-                        <MilestoneDetails />
-                      </Layout>
-                    } />
+
+                  <Route path="/client/signin" element={<Navigate to="/client" replace />} />
+                  <Route path="/client/signup" element={<Navigate to="/client" replace />} />
+                  <Route path="/user/:username" element={
+                    <Layout>
+                      <Profile />
+                    </Layout>
+                  } />
+                  <Route path="/project" element={
+                    <Layout>
+                      <Project />
+                    </Layout>
+                  } />
+                  <Route path="/project/create" element={
+                    <Layout>
+                      <CreateProjectPage />
+                    </Layout>
+                  } />
+                  <Route path="/project/:id" element={
+                    <Layout>
+                      <ProjectDetails />
+                    </Layout>
+                  } />
+                  <Route path="/project/:id/edit" element={
+                    <Layout>
+                      <UpdateProjectPage />
+                    </Layout>
+                  } />
+                  <Route path="/project/:id/milestone/:milestoneId" element={
+                    <Layout>
+                      <MilestoneDetails />
+                    </Layout>
+                  } />
                 </>
               )}
             </>

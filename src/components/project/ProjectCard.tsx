@@ -1,122 +1,219 @@
 import React from "react";
 import { useTheme } from "../theme-provider";
-import { HiOutlineCalendar } from "react-icons/hi";
+import {
+  HiOutlineCalendar,
+  HiOutlineCurrencyDollar,
+  HiOutlineLocationMarker,
+  HiOutlineClock,
+  HiOutlineUser,
+  HiOutlineEye,
+  HiOutlineTrendingUp,
+  HiOutlineChevronRight,
+  HiOutlineBadgeCheck
+} from "react-icons/hi";
 
 export interface ProjectCardProps {
-  title: string;
-  category: string;
-  description: string;
-  deadline: string; // ISO date string
-  status: "In Progress" | "Completed" | "Draft";
+  title?: string;
+  category?: string;
+  description?: string;
+  deadline?: string; // ISO date string
+  status?: "In Progress" | "Completed" | "Draft" | "Open";
   onClick?: () => void;
 }
 
 const DUMMY_PROJECT = {
-  title: "Build a Mobile App",
-  status: "In Progress",
+  title: "Build a Modern E-commerce Platform",
+  status: "Open",
   description:
-    "Design an iOS and Android fintech application with a focus on user-friendly design and performance. Design an iOS and Android fintech application with a focus on user-friendly design and performance.",
-  requirements: ["Experience in React Native or Flutter", "UI/UX design skills"],
-  skills: ["React Native", "Flutter", "UI/UX Design"],
-  budget: "$10,000",
-  deadline: "2024-05-01",
-  serviceType: ["Mobile App Development", "UI/UX Design"],
-  milestones: [
-    { id: 1, title: "Milestone 1", done: true },
-    { id: 2, title: "Milestone 2", done: true },
-    { id: 3, title: "Milestone 3", done: false },
-    { id: 4, title: "Milestone 4", done: false },
-  ],
-  developer: {
-    name: "Jacob Jones",
-    role: "Senior Developer",
-    rate: "$80.00/hr",
+    "Looking for an experienced developer to build a comprehensive e-commerce platform with modern UI/UX, payment integration, inventory management, and admin dashboard. The project requires expertise in React, Node.js, and database design.",
+  requirements: ["Experience in React and Node.js", "E-commerce development", "Payment gateway integration"],
+  skills: ["React", "Node.js", "MongoDB", "Stripe API"],
+  budget: "$12,500",
+  timeframe: "3-4 months",
+  deadline: "2024-05-15",
+  serviceType: ["Web Development", "Full Stack"],
+  location: "Remote",
+  postedAt: "2024-03-10",
+  bidsCount: 12,
+  client: {
+    name: "TechStart Inc.",
+    rating: 4.9,
+    projectsPosted: 15,
+    avatar: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&h=150&fit=crop"
   },
-  bids: [
-    { id: 1, title: "Bid 1", description: "Bid 1 description", amount: "$1000", status: "Accepted", createdAt: "2024-01-01", developerId: 1 },
-    { id: 2, title: "Bid 2", description: "Bid 2 description", amount: "$2000", status: "Pending", createdAt: "2024-01-01", developerId: 2 },
-    { id: 3, title: "Bid 3", description: "Bid 3 description", amount: "$3000", status: "Pending", createdAt: "2024-01-01", developerId: 3 },
-    { id: 4, title: "Bid 4", description: "Bid 4 description", amount: "$4000", status: "Rejected", createdAt: "2024-01-01", developerId: 4 },
-  ],
+  urgency: "Medium",
+  verified: true
 };
 
 const statusColors = {
   light: {
-    "In Progress": "bg-orange-100 text-orange-700",
-    Completed: "bg-emerald-100 text-emerald-700",
-    Draft: "bg-gray-200 text-gray-600",
+    "In Progress": "bg-blue-100 text-blue-700 border-blue-200",
+    "Completed": "bg-emerald-100 text-emerald-700 border-emerald-200",
+    "Draft": "bg-gray-100 text-gray-600 border-gray-200",
+    "Open": "bg-green-100 text-green-700 border-green-200",
   },
   dark: {
-    "In Progress": "bg-orange-800/40 text-orange-200",
-    Completed: "bg-emerald-800/40 text-emerald-200",
-    Draft: "bg-neutral-700 text-neutral-300",
+    "In Progress": "bg-blue-900/30 text-blue-400 border-blue-500/30",
+    "Completed": "bg-emerald-900/30 text-emerald-400 border-emerald-500/30",
+    "Draft": "bg-gray-800/50 text-gray-400 border-gray-600/30",
+    "Open": "bg-green-900/30 text-green-400 border-green-500/30",
   },
 } as const;
 
-export const ProjectCard = () => {
+export const ProjectCard = ({ title, status = "Open", onClick }: ProjectCardProps) => {
   const { theme } = useTheme();
-  const dark = theme === "dark";
+  const isDark = theme === "dark";
 
-  const badgeCls = statusColors[dark ? "dark" : "light"][DUMMY_PROJECT.status as keyof typeof statusColors[keyof typeof statusColors]];
-  const border = dark ? "border-neutral-700" : "border-gray-200";
-  const bg = dark ? "bg-neutral-900 hover:bg-neutral-750" : "bg-white hover:bg-gray-50";
-  const textMain = dark ? "text-gray-200" : "text-gray-900";
-  const textSub = dark ? "text-gray-400" : "text-gray-600";
+  const project = { ...DUMMY_PROJECT, title: title || DUMMY_PROJECT.title, status };
+
+  const bgCard = isDark ? "bg-gray-800/50 backdrop-blur-xl" : "bg-white/80 backdrop-blur-xl";
+  const borderClr = isDark ? "border-gray-700/50" : "border-gray-200/50";
+  const textClr = isDark ? "text-gray-100" : "text-gray-900";
+  const subtleText = isDark ? "text-gray-400" : "text-gray-600";
+  const hoverBg = isDark ? "hover:bg-gray-700/50" : "hover:bg-gray-50/80";
+
+  const statusStyle = statusColors[isDark ? "dark" : "light"][status as keyof typeof statusColors[keyof typeof statusColors]];
+
+  const getUrgencyColor = (urgency: string) => {
+    switch (urgency) {
+      case "High": return "text-red-600 dark:text-red-400";
+      case "Medium": return "text-yellow-600 dark:text-yellow-400";
+      case "Low": return "text-green-600 dark:text-green-400";
+      default: return subtleText;
+    }
+  };
+
+  const daysSincePosted = Math.floor((new Date().getTime() - new Date(project.postedAt).getTime()) / (1000 * 3600 * 24));
 
   return (
-    <button
-      // onClick={onClick}
-      className={`flex w-full flex-col items-start gap-3 rounded-xl border ${border} ${bg} p-6 text-left transition`}
+    <div
+      onClick={onClick}
+      className={`group ${bgCard} rounded-2xl border ${borderClr} p-6 transition-all duration-300 cursor-pointer ${hoverBg} hover:shadow-xl hover:-translate-y-1`}
     >
-      <div className="flex items-start justify-between w-full gap-4">
-        <div>
-          <h3 className={`text-lg font-semibold ${textMain}`}>{DUMMY_PROJECT.title}</h3>
-          <p className={`text-xs uppercase tracking-wide ${textSub}`}>{DUMMY_PROJECT.serviceType[0]} {DUMMY_PROJECT.serviceType.length > 1 ? `+ ${DUMMY_PROJECT.serviceType.length - 1}` : ""}</p>
+      {/* Header Section */}
+      <div className="flex items-start justify-between mb-4">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-2">
+            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${statusStyle}`}>
+              {status === "Open" && <span className="w-2 h-2 bg-current rounded-full mr-1.5 animate-pulse"></span>}
+              {status}
+            </span>
+            {project.verified && (
+              <div className="flex items-center gap-1 text-blue-600 dark:text-blue-400">
+                <HiOutlineBadgeCheck className="w-4 h-4" />
+                <span className="text-xs font-medium">Verified</span>
+              </div>
+            )}
+            <span className={`text-xs ${getUrgencyColor(project.urgency)} font-medium`}>
+              {project.urgency} Priority
+            </span>
+          </div>
+          <h3 className={`text-xl font-bold ${textClr} mb-2 line-clamp-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors`}>
+            {project.title}
+          </h3>
         </div>
-        <span className={`whitespace-nowrap rounded-full px-3 py-1 text-xs font-medium ${badgeCls}`}>{DUMMY_PROJECT.status}</span>
+        <HiOutlineChevronRight className={`w-5 h-5 ${subtleText} group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors flex-shrink-0 ml-4`} />
       </div>
 
-      <p className={`line-clamp-2 text-sm ${textSub}`}>{DUMMY_PROJECT.description}</p>
-      <div className="flex items-center justify-between w-full">
-        <div className="flex flex-wrap gap-2 mt-2">
-          {DUMMY_PROJECT.skills.map((skill) => (
-            <SkillBadge key={skill} skill={skill} />
-          ))}
-        </div>
-        
+      {/* Description */}
+      <p className={`${subtleText} text-sm leading-relaxed mb-4 line-clamp-3`}>
+        {project.description}
+      </p>
+
+      {/* Skills Tags */}
+      <div className="flex flex-wrap gap-2 mb-4">
+        {project.skills.slice(0, 4).map((skill, index) => (
+          <span
+            key={index}
+            className="px-3 py-1 bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-xs font-medium rounded-full"
+          >
+            {skill}
+          </span>
+        ))}
+        {project.skills.length > 4 && (
+          <span className={`px-3 py-1 ${isDark ? 'bg-gray-700' : 'bg-gray-100'} ${subtleText} text-xs rounded-full`}>
+            +{project.skills.length - 4} more
+          </span>
+        )}
       </div>
 
-      <div className="flex items-center justify-between w-full">
-        <div className="mt-2 inline-flex items-center gap-2 text-xs font-medium text-indigo-500">
-          <HiOutlineCalendar className="h-4 w-4" />
-          {new Date(DUMMY_PROJECT.deadline).toLocaleDateString(undefined, {
-            month: "short",
-            day: "numeric",
-            year: "numeric",
-          })}
+      {/* Project Details Grid */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+        <div className="flex items-center gap-2">
+          <HiOutlineCurrencyDollar className={`w-4 h-4 ${subtleText}`} />
+          <div>
+            <p className={`text-sm font-semibold ${textClr}`}>{project.budget}</p>
+            <p className={`text-xs ${subtleText}`}>Budget</p>
+          </div>
         </div>
-        <div>
-            <p>{DUMMY_PROJECT.budget}</p>
+        <div className="flex items-center gap-2">
+          <HiOutlineClock className={`w-4 h-4 ${subtleText}`} />
+          <div>
+            <p className={`text-sm font-semibold ${textClr}`}>{project.timeframe}</p>
+            <p className={`text-xs ${subtleText}`}>Duration</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <HiOutlineCalendar className={`w-4 h-4 ${subtleText}`} />
+          <div>
+            <p className={`text-sm font-semibold ${textClr}`}>
+              {new Date(project.deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+            </p>
+            <p className={`text-xs ${subtleText}`}>Deadline</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <HiOutlineLocationMarker className={`w-4 h-4 ${subtleText}`} />
+          <div>
+            <p className={`text-sm font-semibold ${textClr}`}>{project.location}</p>
+            <p className={`text-xs ${subtleText}`}>Location</p>
+          </div>
         </div>
       </div>
 
-    </button>
+      {/* Footer Section */}
+      <div className="flex items-center justify-between pt-4 border-t border-gray-200/50 dark:border-gray-700/50">
+        {/* Client Info */}
+        <div className="flex items-center gap-3">
+          <img
+            src={project.client.avatar}
+            alt={project.client.name}
+            className="w-10 h-10 rounded-full object-cover ring-2 ring-white/20"
+          />
+          <div>
+            <p className={`text-sm font-semibold ${textClr}`}>{project.client.name}</p>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
+                <span className="text-yellow-500">★</span>
+                <span className={`text-xs ${subtleText}`}>{project.client.rating}</span>
+              </div>
+              <span className={`text-xs ${subtleText}`}>•</span>
+              <span className={`text-xs ${subtleText}`}>{project.client.projectsPosted} projects</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Project Stats */}
+        <div className="flex items-center gap-4 text-right">
+          <div className="flex items-center gap-1">
+            <HiOutlineEye className={`w-4 h-4 ${subtleText}`} />
+            <span className={`text-sm ${subtleText}`}>{project.bidsCount} bids</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <HiOutlineTrendingUp className={`w-4 h-4 ${subtleText}`} />
+            <span className={`text-sm ${subtleText}`}>{daysSincePosted}d ago</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Hover Action Button */}
+      <div className="mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <button className="w-full px-4 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl">
+          View Project Details
+        </button>
+      </div>
+    </div>
   );
 };
 
-
-
-
-interface SkillBadgeProps {
-  skill: string;
-}
-
-const SkillBadge: React.FC<SkillBadgeProps> = ({ skill }) => {
-  return (
-    <span className="inline-flex items-center justify-center rounded-full bg-blue-500 text-white text-xs font-medium px-2 py-1 mr-2">
-      {skill}
-    </span>
-  );
-};
-
-export default SkillBadge;
+export default ProjectCard;
