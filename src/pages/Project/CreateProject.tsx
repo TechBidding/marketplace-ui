@@ -120,7 +120,7 @@ export default function CreateProjectPage() {
         try {
             const res = await projectHttp.post("/projects", fd);
             const resData = res.data;
-            navigate(`/project/${resData.data._id}`);
+            navigate(`/projects/${resData.data._id}`);
             toast.success("Project created successfully! 🎉", {
                 description: "Your project is now live and ready for bids."
             });

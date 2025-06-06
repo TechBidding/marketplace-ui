@@ -1,4 +1,4 @@
-import { useForm, SubmitHandler} from "react-hook-form"
+import { useForm, SubmitHandler } from "react-hook-form"
 import './auth.css'
 import { z } from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -52,7 +52,7 @@ export const DevRegister = () => {
             toast.success("Registration successful", {
                 description: "Please verify your email to login"
             })
-            navigate("/dev")
+            navigate("/dashboard")
         }).catch((error) => {
             setIsLoading(false)
             console.error("Registration failed", error.response.data)
@@ -108,7 +108,7 @@ export const DevRegister = () => {
                     </div>
                     <div className="input-group">
                         <label>Username</label>
-                        <input {...register("userName", { required: true })} placeholder="Enter unique username" disabled={isLoading} onChange={(e)=>checkUserName(e.target.value)} />
+                        <input {...register("userName", { required: true })} placeholder="Enter unique username" disabled={isLoading} onChange={(e) => checkUserName(e.target.value)} />
                         {errors.userName && (
                             <p className="error-message" role="alert">{errors.userName.message}</p>
                         )}

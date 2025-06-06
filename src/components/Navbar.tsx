@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useDispatch, useSelector } from "react-redux";
-import { NavBarList } from "@/utility/contants";
+import { CommonNavItems, DeveloperNavItems, ClientNavItems } from "@/utility/contants";
 import { TbLayoutSidebarLeftExpandFilled, TbLayoutSidebarRightExpandFilled } from "react-icons/tb";
 import { HiOutlineLogout, HiOutlineUser, HiOutlineCog } from "react-icons/hi";
 import { ModeToggle } from "./mode-toggle";
@@ -22,10 +22,20 @@ import { Link, useNavigate } from "react-router-dom";
 export const Navbar = () => {
     const [expanded, setExpanded] = useState<boolean>(false);
     const userDetails = useSelector((state: any) => state.auth.userDetails);
+    const userType = useSelector((state: any) => state.auth.userType);
     const dispatch = useDispatch();
     const { theme } = useTheme();
     const navigate = useNavigate()
     const isDark = theme === "dark"
+
+    // Get navigation items based on user type
+    const getNavigationItems = () => {
+        const commonItems = CommonNavItems;
+        const roleItems = userType === "client" ? ClientNavItems : DeveloperNavItems;
+        return [...commonItems, ...roleItems];
+    };
+
+    const navigationItems = getNavigationItems();
 
     const handleLogout = () => {
         userHttp.post('developer/logout').then(() => {
@@ -70,18 +80,18 @@ export const Navbar = () => {
                 {/* Navigation Items */}
                 <div className="flex-1">
                     <ul className="space-y-2">
-                        {NavBarList.map((item, index) => (
+                        {navigationItems.map((item, index) => (
                             <li key={index}>
                                 <Link
                                     to={item.link}
                                     className={`group flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 ${isDark
-                                            ? 'text-gray-300 hover:text-white hover:bg-gray-800/60'
-                                            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100/60'
+                                        ? 'text-gray-300 hover:text-white hover:bg-gray-800/60'
+                                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100/60'
                                         } relative overflow-hidden`}
                                 >
                                     <div className={`p-2 rounded-lg transition-all duration-200 ${isDark
-                                            ? 'bg-gray-800/50 group-hover:bg-indigo-600/20'
-                                            : 'bg-gray-100/50 group-hover:bg-indigo-100'
+                                        ? 'bg-gray-800/50 group-hover:bg-indigo-600/20'
+                                        : 'bg-gray-100/50 group-hover:bg-indigo-100'
                                         }`}>
                                         <item.icon className={`w-5 h-5 transition-colors duration-200 ${isDark ? 'group-hover:text-indigo-400' : 'group-hover:text-indigo-600'
                                             }`} />
@@ -110,8 +120,8 @@ export const Navbar = () => {
                         <button
                             onClick={() => setExpanded(!expanded)}
                             className={`p-2 rounded-lg transition-all duration-200 ${isDark
-                                    ? 'bg-gray-800/50 hover:bg-gray-700/50 text-gray-300 hover:text-white'
-                                    : 'bg-gray-100/50 hover:bg-gray-200/50 text-gray-600 hover:text-gray-900'
+                                ? 'bg-gray-800/50 hover:bg-gray-700/50 text-gray-300 hover:text-white'
+                                : 'bg-gray-100/50 hover:bg-gray-200/50 text-gray-600 hover:text-gray-900'
                                 } ${expanded ? 'order-2' : 'order-1'}`}
                         >
                             {expanded ? (
@@ -126,8 +136,8 @@ export const Navbar = () => {
                     <div className={`border-t ${isDark ? 'border-gray-800' : 'border-gray-200'} pt-4`}>
                         <DropdownMenu>
                             <DropdownMenuTrigger className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-200 ${isDark
-                                    ? 'hover:bg-gray-800/60 text-gray-300 hover:text-white'
-                                    : 'hover:bg-gray-100/60 text-gray-600 hover:text-gray-900'
+                                ? 'hover:bg-gray-800/60 text-gray-300 hover:text-white'
+                                : 'hover:bg-gray-100/60 text-gray-600 hover:text-gray-900'
                                 } focus:outline-none focus:ring-2 focus:ring-indigo-500/50`}>
                                 <Avatar className="w-10 h-10 ring-2 ring-white/20 shadow-lg">
                                     <AvatarImage

@@ -49,7 +49,7 @@ function App() {
   useEffect(() => {
     if (!isLoggedIn || !user_type) return;
 
-    if ((user_type === UserTypes.developer && location.pathname.startsWith('/dev')) || (user_type === UserTypes.client && location.pathname.startsWith('/client'))) {
+    if ((user_type === UserTypes.developer && location.pathname.startsWith('/dashboard')) || (user_type === UserTypes.client && location.pathname.startsWith('/dashboard'))) {
       return;
     }
     else {
@@ -68,26 +68,25 @@ function App() {
               <Route path="/" element={
                 <Home />
               } />
-              <Route path="/client/signup" element={
+
+              {/* New unified routes with role support */}
+              <Route path="/signup" element={
                 <Auth>
-                  <ClientRegister />
+                  {/* Check URL params to determine which component to render */}
+                  {location.search.includes('role=client') ? <ClientRegister /> :
+                    location.search.includes('role=developer') ? <DevRegister /> :
+                      <Navigate to="/" replace />}
                 </Auth>
               } />
-              <Route path="/dev/signup" element={
+              <Route path="/login" element={
                 <Auth>
-                  <DevRegister />
+                  {/* Check URL params to determine which component to render */}
+                  {location.search.includes('role=client') ? <ClientLogin /> :
+                    location.search.includes('role=developer') ? <DevLogin /> :
+                      <Navigate to="/" replace />}
                 </Auth>
               } />
-              <Route path="/client/signin" element={
-                <Auth>
-                  <ClientLogin />
-                </Auth>
-              } />
-              <Route path="/dev/signin" element={
-                <Auth>
-                  <DevLogin />
-                </Auth>
-              } />
+
               <Route path="/user/:username" element={
                 <Layout>
                   <Profile />
@@ -99,36 +98,54 @@ function App() {
             <>
               {user_type === UserTypes.developer && (
                 <>
-                  <Route path="/dev" element={
+                  <Route path="/dashboard" element={
+                    <Layout>
+                      <DevHome />
+                    </Layout>
+                  } />
+                  <Route path="/browse" element={
                     <Layout>
                       <DevHome />
                     </Layout>
                   } />
 
-                  <Route path="/dev/services" element={
+                  <Route path="/services" element={
                     <Layout>
                       <Services />
                     </Layout>
                   } />
 
-                  <Route path="/dev/signin" element={<Navigate to="/dev" replace />} />
-                  <Route path="/dev/signup" element={<Navigate to="/dev" replace />} />
+                  <Route path="/settings" element={
+                    <Layout>
+                      <div className="p-8">
+                        <h1 className="text-2xl font-bold">Settings</h1>
+                        <p className="text-gray-600 mt-2">Settings page coming soon...</p>
+                      </div>
+                    </Layout>
+                  } />
+
+                  {/* Redirect old and new routes to dashboard
+                  <Route path="/dev" element={<Navigate to="/dashboard" replace />} />
+                  <Route path="/dev/services" element={<Navigate to="/services" replace />} />
+                  <Route path="/login" element={<Navigate to="/dashboard" replace />} />
+                  <Route path="/signup" element={<Navigate to="/dashboard" replace />} /> */}
+
                   <Route path="/user/:username" element={
                     <Layout>
                       <Profile />
                     </Layout>
                   } />
-                  <Route path="/project/:id" element={
+                  <Route path="/projects/:id" element={
                     <Layout>
                       <ProjectDetails />
                     </Layout>
                   } />
-                  <Route path="/project/:id/edit" element={
+                  <Route path="/projects/:id/edit" element={
                     <Layout>
                       <UpdateProjectPage />
                     </Layout>
                   } />
-                  <Route path="/project/:id/milestone/:milestoneId" element={
+                  <Route path="/projects/:id/milestone/:milestoneId" element={
                     <Layout>
                       <MilestoneDetails />
                     </Layout>
@@ -137,40 +154,57 @@ function App() {
               )}
               {user_type === UserTypes.client && (
                 <>
-                  <Route path="/client" element={
+                  <Route path="/dashboard" element={
                     <Layout>
                       <ClientHome />
                     </Layout>
                   } />
+                  <Route path="/browse" element={
+                    <Layout>
+                      <DevHome />
+                    </Layout>
+                  } />
 
-                  <Route path="/client/signin" element={<Navigate to="/client" replace />} />
-                  <Route path="/client/signup" element={<Navigate to="/client" replace />} />
+                  <Route path="/settings" element={
+                    <Layout>
+                      <div className="p-8">
+                        <h1 className="text-2xl font-bold">Settings</h1>
+                        <p className="text-gray-600 mt-2">Settings page coming soon...</p>
+                      </div>
+                    </Layout>
+                  } />
+
+                  {/* Redirect old routes to dashboard
+                  <Route path="/client" element={<Navigate to="/dashboard" replace />} />
+                  <Route path="/login" element={<Navigate to="/dashboard" replace />} />
+                  <Route path="/signup" element={<Navigate to="/dashboard" replace />} /> */}
+
                   <Route path="/user/:username" element={
                     <Layout>
                       <Profile />
                     </Layout>
                   } />
-                  <Route path="/project" element={
+                  <Route path="/projects" element={
                     <Layout>
                       <Project />
                     </Layout>
                   } />
-                  <Route path="/project/create" element={
+                  <Route path="/projects/create" element={
                     <Layout>
                       <CreateProjectPage />
                     </Layout>
                   } />
-                  <Route path="/project/:id" element={
+                  <Route path="/projects/:id" element={
                     <Layout>
                       <ProjectDetails />
                     </Layout>
                   } />
-                  <Route path="/project/:id/edit" element={
+                  <Route path="/projects/:id/edit" element={
                     <Layout>
                       <UpdateProjectPage />
                     </Layout>
                   } />
-                  <Route path="/project/:id/milestone/:milestoneId" element={
+                  <Route path="/projects/:id/milestone/:milestoneId" element={
                     <Layout>
                       <MilestoneDetails />
                     </Layout>

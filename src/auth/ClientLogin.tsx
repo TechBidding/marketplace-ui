@@ -22,20 +22,20 @@ export const ClientLogin = () => {
     resolver: zodResolver(clientLoginSchema)
   })
   const navigate = useNavigate()
-  const dispatch= useDispatch()
+  const dispatch = useDispatch()
 
 
   const onSubmit: SubmitHandler<IClientLoginInput> = (data) => {
-      userHttp.post('auth/client-login', data).then(() => {
-        dispatch(login())
-        toast.success("Login successful")
-        navigate("/client")
+    userHttp.post('auth/client-login', data).then(() => {
+      dispatch(login())
+      toast.success("Login successful")
+      navigate("/dashboard")
 
-      }).catch((error) => {
-        toast.error("Login failed. Please check your credentials.", {
-          description: error.response.data.message,
-        })
+    }).catch((error) => {
+      toast.error("Login failed. Please check your credentials.", {
+        description: error.response.data.message,
       })
+    })
   }
 
   return (
@@ -69,7 +69,7 @@ export const ClientLogin = () => {
           <button type="submit" className="submit-button">Sign In</button>
         </div>
         <div className="form-footer">
-          <p>Don't have an account? <Link to="/client/signup">Sign up</Link></p>
+          <p>Don't have an account? <Link to="/signup?role=client">Sign up</Link></p>
         </div>
       </form>
     </div>

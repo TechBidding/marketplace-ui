@@ -60,7 +60,19 @@ export default function UpdateProjectPage() {
     const { theme } = useTheme();
     const isDark = theme === "dark";
     const navigate = useNavigate();
-    const { id } = useParams();
+    const { id } = useParams<{ id: string }>();
+
+    // Early return if no project ID
+    if (!id) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="text-center">
+                    <h1 className="text-2xl font-bold text-red-600">Invalid Project ID</h1>
+                    <p className="text-gray-600 mt-2">Please check the URL and try again.</p>
+                </div>
+            </div>
+        );
+    }
 
     const [loading, setLoading] = useState(true);
     const [project, setProject] = useState<any>(null);
@@ -148,7 +160,7 @@ export default function UpdateProjectPage() {
         data.serviceType.forEach(s => fd.append("serviceType", s));
         data.requiredSkills.forEach(s => fd.append("requiredSkills", s));
         data.requirements?.forEach(r => fd.append("requirements", r));
-        data.projectIds?.forEach(id => fd.append("projectIds", id));
+        data.projectIds?.forEach(projectId => fd.append("projectIds", projectId));
 
         /* -------------- file (optional for update) ---------------------- */
         if (file) {
@@ -157,7 +169,7 @@ export default function UpdateProjectPage() {
 
         try {
             const res = await projectHttp.put(`/projects/${id}`, fd);
-            navigate(`/project/${id}`);
+            navigate(`/projects/${id}`);
             toast.success("Project updated successfully! ✨", {
                 description: "Your changes have been saved."
             });
@@ -455,7 +467,7 @@ export default function UpdateProjectPage() {
                     <div className="flex justify-end gap-4 pt-4">
                         <button
                             type="button"
-                            onClick={() => navigate(`/project/${id}`)}
+                            onClick={() => navigate(`/projects/${id}`)}
                             className={`px-6 py-3 border ${borderClr} rounded-xl font-medium transition-colors ${isDark ? 'hover:bg-gray-700/50' : 'hover:bg-gray-50'} ${textClr}`}
                         >
                             Cancel

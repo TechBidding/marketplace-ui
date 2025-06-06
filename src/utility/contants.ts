@@ -1,24 +1,53 @@
 import { LuSettings2 } from "react-icons/lu";
+import { HiOutlineHome, HiOutlineBriefcase, HiOutlineUserGroup, HiOutlineCog, HiOutlineUser, HiOutlinePlus } from "react-icons/hi";
 
+// Common navigation items for all users
+export const CommonNavItems = [
+    {
+        name: "Dashboard",
+        icon: HiOutlineHome,
+        link: "/dashboard"
+    },
+    {
+        name: "Browse Talent",
+        icon: HiOutlineUserGroup,
+        link: "/browse"
+    },
+    {
+        name: "Settings",
+        icon: HiOutlineCog,
+        link: "/settings"
+    }
+];
 
+// Developer-specific navigation items
+export const DeveloperNavItems = [
+    {
+        name: "Services",
+        icon: LuSettings2,
+        link: "/services"
+    }
+];
+
+// Client-specific navigation items  
+export const ClientNavItems = [
+    {
+        name: "Projects",
+        icon: HiOutlineBriefcase,
+        link: "/projects"
+    },
+    {
+        name: "Create Project",
+        icon: HiOutlinePlus,
+        link: "/projects/create"
+    }
+];
+
+// Legacy NavBarList for backward compatibility (defaults to developer view)
 export const NavBarList = [
-        {
-            name: "Settings",
-            icon: LuSettings2,
-            link: "settings"
-        },
-        {
-            name: "Profile",
-            icon: LuSettings2 ,
-            link: "profile"
-        },
-        {
-            name: "Services",
-            icon: LuSettings2,
-            link: "services"
-        }
-]
-    
+    ...CommonNavItems,
+    ...DeveloperNavItems
+];
 
 export const ServiceEnum = {
     WEB_DEVELOPMENT: "Web Development",

@@ -472,7 +472,7 @@ export default function ProjectDetails() {
                           icon={<MdEdit className="h-4 w-4" />}
                           label="Edit Project"
                           hoverClr={hoverClr}
-                          onClick={() => navigate(`/project/${project._id}/edit`)}
+                          onClick={() => navigate(`/projects/${project._id}/edit`)}
                         />
                         <SidebarAction
                           icon={<MdOutlinePlaylistAdd className="h-4 w-4" />}

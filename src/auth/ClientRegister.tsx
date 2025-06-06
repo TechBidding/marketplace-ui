@@ -48,7 +48,7 @@ export const ClientRegister = () => {
             toast.success("Registration successful", {
                 description: "Please verify your email to login"
             })
-            navigate("/client")
+            navigate("/dashboard")
 
         }).catch((error) => {
             setIsLoading(false)

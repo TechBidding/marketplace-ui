@@ -70,21 +70,21 @@ export const ClientHome = () => {
       title: "Post New Project",
       description: "Create a new project and find the perfect developer",
       icon: <HiOutlinePlus className="w-6 h-6" />,
-      action: () => navigate("/project/create"),
+      action: () => navigate("/projects/create"),
       color: "from-indigo-600 to-purple-600"
     },
     {
       title: "Browse Talent",
       description: "Explore our network of skilled developers",
       icon: <HiOutlineUsers className="w-6 h-6" />,
-      action: () => navigate("/developers"),
+      action: () => navigate("/browse"),
       color: "from-emerald-600 to-teal-600"
     },
     {
-      title: "View Analytics",
-      description: "Track your project performance and spending",
+      title: "View Projects",
+      description: "Track your project performance and manage ongoing work",
       icon: <HiOutlineChartBar className="w-6 h-6" />,
-      action: () => navigate("/analytics"),
+      action: () => navigate("/projects"),
       color: "from-orange-600 to-red-600"
     }
   ];
@@ -112,10 +112,10 @@ export const ClientHome = () => {
           <p className={`text-sm ${subtleText} mb-3`}>Developer: {project.developer}</p>
         </div>
         <div className={`px-3 py-1 rounded-full text-xs font-medium ${project.status === 'completed'
-            ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
-            : project.status === 'review'
-              ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
-              : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+          ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+          : project.status === 'review'
+            ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+            : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
           }`}>
           {project.status.replace('-', ' ')}
         </div>
@@ -140,7 +140,7 @@ export const ClientHome = () => {
           <span className={`${subtleText}`}>Due: {new Date(project.dueDate).toLocaleDateString()}</span>
         </div>
         <button
-          onClick={() => navigate(`/project/${project.id}`)}
+          onClick={() => navigate(`/projects/${project.id}`)}
           className="px-3 py-1 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg text-sm font-medium transition-colors"
         >
           View Details
@@ -171,7 +171,7 @@ export const ClientHome = () => {
                   </p>
                 </div>
                 <button
-                  onClick={() => navigate("/project/create")}
+                  onClick={() => navigate("/projects/create")}
                   className="flex items-center gap-3 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white px-8 py-4 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                 >
                   <HiOutlinePlus className="h-6 w-6" />
@@ -260,7 +260,7 @@ export const ClientHome = () => {
                   <h3 className={`text-lg font-semibold ${textClr} mb-2`}>No projects yet</h3>
                   <p className={`${subtleText} mb-6`}>Start your first project to see it here</p>
                   <button
-                    onClick={() => navigate("/project/create")}
+                    onClick={() => navigate("/projects/create")}
                     className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                   >
                     Create Your First Project

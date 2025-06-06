@@ -27,18 +27,18 @@ export const DevLogin = () => {
 
 
   const onSubmit: SubmitHandler<IDevLoginInput> = (data) => {
-      setIsLoading(true)
+    setIsLoading(true)
     userHttp.post('auth/developer-login', data).then(() => {
-        setIsLoading(false)
-        dispatch(login())
-        toast.success("Login successful")
-        navigate("/dev")
+      setIsLoading(false)
+      dispatch(login())
+      toast.success("Login successful")
+      navigate("/dashboard")
     }).catch((error) => {
-        setIsLoading(false)
-        toast.error("Login failed. Please check your credentials.", {
-          description: error.response.data.message,
-        })
+      setIsLoading(false)
+      toast.error("Login failed. Please check your credentials.", {
+        description: error.response.data.message,
       })
+    })
   }
 
   return (
@@ -73,7 +73,7 @@ export const DevLogin = () => {
           <button type="submit" className="submit-button" disabled={isLoading}>Sign In</button>
         </div>
         <div className="form-footer">
-          <p>Don't have an account? <Link to="/dev/signup">Sign up</Link></p>
+          <p>Don't have an account? <Link to="/signup?role=developer">Sign up</Link></p>
         </div>
       </form>
     </div>

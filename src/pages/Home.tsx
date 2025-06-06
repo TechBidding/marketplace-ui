@@ -163,6 +163,88 @@ export const Home = () => {
         </div>
       </section>
 
+      {/* User Selection Section */}
+      <section className="py-16 px-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className={`text-4xl lg:text-5xl font-bold ${textClr} mb-6`}>
+              Choose Your Path
+            </h2>
+            <p className={`text-xl ${subtleText} max-w-3xl mx-auto`}>
+              Whether you're looking to hire talent or showcase your skills, we've got you covered.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            {/* Client Card */}
+            <div className={`${bgCard} rounded-3xl p-8 border ${borderClr} hover:shadow-2xl transition-all duration-300 group relative overflow-hidden`}>
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-purple-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div className="relative z-10">
+                <div className="flex justify-center mb-6">
+                  <div className="p-4 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl text-white">
+                    <HiOutlineUserGroup className="w-12 h-12" />
+                  </div>
+                </div>
+                <h3 className={`text-2xl font-bold ${textClr} mb-4 text-center`}>
+                  I'm a Client
+                </h3>
+                <p className={`${subtleText} text-center mb-8 leading-relaxed`}>
+                  Looking to hire talented developers for your next project? Post your requirements and connect with skilled professionals.
+                </p>
+                <div className="space-y-4">
+                  <button
+                    onClick={() => navigate("/signup?role=client")}
+                    className="w-full flex items-center justify-center gap-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-4 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                  >
+                    Sign Up as Client
+                    <HiOutlineArrowRight className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => navigate("/login?role=client")}
+                    className={`w-full flex items-center justify-center gap-3 ${isDark ? 'bg-gray-700 hover:bg-gray-600 text-gray-100' : 'bg-gray-100 hover:bg-gray-200 text-gray-900'} px-6 py-4 rounded-xl font-semibold transition-all duration-200`}
+                  >
+                    Login as Client
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Developer Card */}
+            <div className={`${bgCard} rounded-3xl p-8 border ${borderClr} hover:shadow-2xl transition-all duration-300 group relative overflow-hidden`}>
+              <div className="absolute inset-0 bg-gradient-to-br from-emerald-600/5 to-teal-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div className="relative z-10">
+                <div className="flex justify-center mb-6">
+                  <div className="p-4 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-2xl text-white">
+                    <HiOutlineCode className="w-12 h-12" />
+                  </div>
+                </div>
+                <h3 className={`text-2xl font-bold ${textClr} mb-4 text-center`}>
+                  I'm a Developer
+                </h3>
+                <p className={`${subtleText} text-center mb-8 leading-relaxed`}>
+                  Ready to showcase your skills and work on exciting projects? Join our community of talented developers.
+                </p>
+                <div className="space-y-4">
+                  <button
+                    onClick={() => navigate("/signup?role=developer")}
+                    className="w-full flex items-center justify-center gap-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-6 py-4 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                  >
+                    Sign Up as Developer
+                    <HiOutlineArrowRight className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => navigate("/login?role=developer")}
+                    className={`w-full flex items-center justify-center gap-3 ${isDark ? 'bg-gray-700 hover:bg-gray-600 text-gray-100' : 'bg-gray-100 hover:bg-gray-200 text-gray-900'} px-6 py-4 rounded-xl font-semibold transition-all duration-200`}
+                  >
+                    Login as Developer
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Stats Section */}
       <section className="py-16 px-4">
         <div className="max-w-7xl mx-auto">
