@@ -118,10 +118,10 @@ export default function CreateProjectPage() {
         fd.append("image", file);
 
         try {
-            const res = await projectHttp.post("/projects", fd);
+            const res = await projectHttp.post("/project", fd);
             const resData = res.data;
             navigate(`/projects/${resData.data._id}`);
-            toast.success("Project created successfully! 🎉", {
+            toast.success("Project created successfully!", {
                 description: "Your project is now live and ready for bids."
             });
         } catch (err: any) {

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useTheme } from "@/components/theme-provider";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -14,18 +14,43 @@ import {
   HiOutlineChat,
   HiOutlineSparkles
 } from "react-icons/hi";
+import { projectHttp } from "@/utility/api";
 
 export const ClientHome = () => {
   const { theme } = useTheme();
   const navigate = useNavigate();
   const userDetails = useSelector((state: any) => state.auth.userDetails);
   const isDark = theme === "dark";
+  const [isLoading, setIsLoading] = useState(false);
+  const [isProjectsLoading, setIsProjectsLoading] = useState(false);
+  const [isAnalyticsLoading, setIsAnalyticsLoading] = useState(false);
+  const [recentProjects, setRecentProjects] = useState([]);
 
   const bgPage = isDark ? "bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800" : "bg-gradient-to-br from-gray-50 via-white to-gray-100";
   const bgCard = isDark ? "bg-gray-800/50 backdrop-blur-xl" : "bg-white/80 backdrop-blur-xl";
   const borderClr = isDark ? "border-gray-700/50" : "border-gray-200/50";
   const textClr = isDark ? "text-gray-100" : "text-gray-900";
   const subtleText = isDark ? "text-gray-400" : "text-gray-600";
+
+
+  useEffect(() => {
+    const fetchRecentProjects = async () => {
+      setIsLoading(true);
+      setIsProjectsLoading(true);
+      try {
+        const response = await projectHttp.get('/project/dashboard');
+        const data = response.data.data;
+        console.log(data);
+        setRecentProjects(data);
+      } catch (error) {
+        console.error('Error fetching recent projects:', error);
+      } finally {
+        setIsProjectsLoading(false);
+        setIsLoading(false);
+      }
+    };
+    fetchRecentProjects();
+  }, []);
 
   // Mock data - replace with actual API calls
   const stats = {
@@ -35,35 +60,35 @@ export const ClientHome = () => {
     avgProjectValue: 5200
   };
 
-  const recentProjects = [
-    {
-      id: 1,
-      title: "E-commerce Platform Development",
-      status: "in-progress",
-      budget: 8000,
-      developer: "John Smith",
-      progress: 75,
-      dueDate: "2024-04-15"
-    },
-    {
-      id: 2,
-      title: "Mobile App UI/UX Design",
-      status: "review",
-      budget: 3500,
-      developer: "Sarah Johnson",
-      progress: 90,
-      dueDate: "2024-03-28"
-    },
-    {
-      id: 3,
-      title: "Website Redesign",
-      status: "completed",
-      budget: 4200,
-      developer: "Mike Chen",
-      progress: 100,
-      dueDate: "2024-03-20"
-    }
-  ];
+  // const recentProjects = [
+  //   {
+  //     id: 1,
+  //     title: "E-commerce Platform Development",
+  //     status: "in-progress",
+  //     budget: 8000,
+  //     developer: "John Smith",
+  //     progress: 75,
+  //     dueDate: "2024-04-15"
+  //   },
+  //   {
+  //     id: 2,
+  //     title: "Mobile App UI/UX Design",
+  //     status: "review",
+  //     budget: 3500,
+  //     developer: "Sarah Johnson",
+  //     progress: 90,
+  //     dueDate: "2024-03-28"
+  //   },
+  //   {
+  //     id: 3,
+  //     title: "Website Redesign",
+  //     status: "completed",
+  //     budget: 4200,
+  //     developer: "Mike Chen",
+  //     progress: 100,
+  //     dueDate: "2024-03-20"
+  //   }
+  // ];
 
   const quickActions = [
     {
@@ -109,7 +134,12 @@ export const ClientHome = () => {
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
           <h3 className={`text-lg font-semibold ${textClr} mb-2`}>{project.title}</h3>
-          <p className={`text-sm ${subtleText} mb-3`}>Developer: {project.developer}</p>
+          {project.status !== 'open' ?
+            (<p className={`text-sm ${subtleText} mb-3`}>Developer: {project.developerInfo?.name}</p>)
+            :
+            (<p className={`text-sm ${subtleText} mb-3`}>No developer assigned</p>)
+          }
+
         </div>
         <div className={`px-3 py-1 rounded-full text-xs font-medium ${project.status === 'completed'
           ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
@@ -136,11 +166,11 @@ export const ClientHome = () => {
 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4 text-sm">
-          <span className={`${subtleText}`}>Budget: ${project.budget.toLocaleString()}</span>
-          <span className={`${subtleText}`}>Due: {new Date(project.dueDate).toLocaleDateString()}</span>
+          <span className={`${subtleText}`}>Budget: { project.pricing.currency} {project.pricing.amount.toLocaleString()}</span>
+          <span className={`${subtleText}`}>Due: {new Date(project.deadline).toLocaleDateString()}</span>
         </div>
         <button
-          onClick={() => navigate(`/projects/${project.id}`)}
+          onClick={() => navigate(`/projects/${project._id}`)}
           className="px-3 py-1 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg text-sm font-medium transition-colors"
         >
           View Details
@@ -252,7 +282,7 @@ export const ClientHome = () => {
             </div>
             <div className="space-y-4">
               {recentProjects.map((project) => (
-                <ProjectCard key={project.id} project={project} />
+                <ProjectCard key={project._id} project={project} />
               ))}
               {recentProjects.length === 0 && (
                 <div className={`${bgCard} rounded-2xl border ${borderClr} p-12 text-center`}>

@@ -59,7 +59,7 @@ export type Service = (typeof ServiceEnum)[keyof typeof ServiceEnum];
 
 export const SkillEnum = {
     REACT: "React",
-    NODE_JS: "Node.js",
+    NODE_JS: "NodeJs",
     PYTHON: "Python",
     JAVA: "Java",
 } as const;

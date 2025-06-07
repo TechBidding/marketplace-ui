@@ -122,7 +122,11 @@ export default function UpdateProjectPage() {
                     setValue("description", projectData.description);
                     setValue("pricing.amount", projectData.pricing.amount);
                     setValue("pricing.currency", projectData.pricing.currency);
-                    setValue("deadline", new Date(projectData.deadline));
+                    // Format date for HTML date input (YYYY-MM-DD)
+                    const deadlineDate = new Date(projectData.deadline);
+                    const formattedDeadline = deadlineDate.toISOString().split('T')[0];
+                    // @ts-ignore
+                    setValue("deadline", formattedDeadline);
                     setValue("serviceType", projectData.serviceType);
                     setValue("requiredSkills", projectData.requiredSkills);
                     setValue("requirements", projectData.requirements || []);
@@ -157,10 +161,10 @@ export default function UpdateProjectPage() {
         fd.append("pricing.amount", data.pricing.amount.toString());
 
         /* -------------- arrays -------------------- */
-        data.serviceType.forEach(s => fd.append("serviceType", s));
-        data.requiredSkills.forEach(s => fd.append("requiredSkills", s));
-        data.requirements?.forEach(r => fd.append("requirements", r));
-        data.projectIds?.forEach(projectId => fd.append("projectIds", projectId));
+        data.serviceType.forEach(s => fd.append("serviceType[]", s));
+        data.requiredSkills.forEach(s => fd.append("requiredSkills[]", s));
+        data.requirements?.forEach(r => fd.append("requirements[]", r));
+        data.projectIds?.forEach(projectId => fd.append("projectIds[]", projectId));
 
         /* -------------- file (optional for update) ---------------------- */
         if (file) {
@@ -168,7 +172,7 @@ export default function UpdateProjectPage() {
         }
 
         try {
-            const res = await projectHttp.put(`/projects/${id}`, fd);
+            const res = await projectHttp.patch(`/project/${id}`, fd);
             navigate(`/projects/${id}`);
             toast.success("Project updated successfully! ✨", {
                 description: "Your changes have been saved."
@@ -281,6 +285,7 @@ export default function UpdateProjectPage() {
                                             {...register("pricing.amount", { valueAsNumber: true })}
                                             className={`w-full rounded-xl pl-10 pr-4 py-3 border ${borderClr} ${inputBg} focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition-all`}
                                             placeholder="Enter your budget"
+                                            value={project.pricing.amount}
                                         />
                                     </div>
                                 </FormField>
@@ -293,6 +298,7 @@ export default function UpdateProjectPage() {
                                         id="currency"
                                         {...register("pricing.currency")}
                                         className={`w-full rounded-xl px-4 py-3 border ${borderClr} ${inputBg} focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition-all`}
+                                        value={project.pricing.currency}
                                     >
                                         <option value="">Select Currency</option>
                                         {createProjectSchema.shape.pricing.shape.currency.options.map((cur) => (
@@ -331,6 +337,7 @@ export default function UpdateProjectPage() {
                                                 value={svc}
                                                 {...register("serviceType")}
                                                 className="w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
+                                                checked={project.serviceType.includes(svc)}
                                             />
                                             <span className={`text-sm font-medium ${textClr}`}>{svc}</span>
                                         </label>
@@ -352,6 +359,7 @@ export default function UpdateProjectPage() {
                                                 value={skill}
                                                 {...register("requiredSkills")}
                                                 className="w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
+                                                checked={project.requiredSkills.includes(skill)}
                                             />
                                             <span className={`text-sm font-medium ${textClr}`}>{skill}</span>
                                         </label>
@@ -417,7 +425,7 @@ export default function UpdateProjectPage() {
                                 <input
                                     id="deadline"
                                     type="date"
-                                    {...register("deadline", { valueAsDate: true })}
+                                    {...register("deadline")}
                                     className={`w-full rounded-xl px-4 py-3 border ${borderClr} ${inputBg} focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition-all`}
                                 />
                             </FormField>
@@ -444,9 +452,9 @@ export default function UpdateProjectPage() {
                                             file ? setFile(file) : setFile(null);
                                         }}
                                     />
-                                    {image ? (
+                                    {project.projectImage ? (
                                         <div className="relative w-full h-full">
-                                            <img src={image} alt="Project preview" className="w-full h-full object-cover" />
+                                            <img src={project.projectImage} alt="Project preview" className="w-full h-full object-cover" />
                                             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                                 <span className="text-white font-medium">Click to change image</span>
                                             </div>
