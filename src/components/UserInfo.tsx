@@ -13,6 +13,7 @@ export const UserInfo = () => {
     const { theme } = useTheme()
     const isDark = theme === "dark"
     const userDetails = useSelector((state: any) => state.auth.userDetails)
+    const userType = useSelector((state: any) => state.auth.userType)
     const isLoggedIn = useSelector((state: any) => state.auth.isLoggedIn)
     const params = useParams()
     const [userData, setUserData] = useState<any>(null)
@@ -70,7 +71,7 @@ export const UserInfo = () => {
                             </p>
                             <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400">
                                 <HiOutlineUser className="w-4 h-4 mr-1" />
-                                {userData?.userType === 'developer' ? 'Developer' : 'Client'}
+                                {userType === 'developer' ? 'Developer' : 'Client'}
                             </div>
                         </div>
                     </div>
