@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ProjectCard } from "@/components/project/ProjectCard";
 import { useTheme } from "@/components/theme-provider";
 import { useSelector } from "react-redux";
@@ -16,6 +16,7 @@ import {
   HiOutlineEye,
   HiOutlineAdjustments
 } from "react-icons/hi";
+import { projectHttp } from "@/utility/api";
 
 export const DevHome = () => {
   const { theme } = useTheme();
@@ -24,15 +25,53 @@ export const DevHome = () => {
   const isDark = theme === "dark";
 
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedBudget, setSelectedBudget] = useState("all");
-  const [sortBy, setSortBy] = useState("latest");
+  const [sortBy, setSortBy] = useState("newest");
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const bgPage = isDark ? "bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800" : "bg-gradient-to-br from-gray-50 via-white to-gray-100";
   const bgCard = isDark ? "bg-gray-800/50 backdrop-blur-xl" : "bg-white/80 backdrop-blur-xl";
   const borderClr = isDark ? "border-gray-700/50" : "border-gray-200/50";
   const textClr = isDark ? "text-gray-100" : "text-gray-900";
   const subtleText = isDark ? "text-gray-400" : "text-gray-600";
+
+  // Debounce search term
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        setLoading(true);
+        const queryParams = new URLSearchParams();
+        queryParams.append('sortBy', sortBy);
+        selectedCategory !== 'all' && queryParams.append('serviceType', selectedCategory);
+        selectedBudget !== 'all' && queryParams.append('pricing[min]', selectedBudget.split('-')[0]);
+        selectedBudget !== 'all' && queryParams.append('pricing[max]', selectedBudget.split('-')[1]);
+        debouncedSearchTerm && queryParams.append('search', debouncedSearchTerm);
+
+        const response = await projectHttp.get(`/project/dashboard?${queryParams.toString()}`);
+        setProjects(response.data.data);
+      }
+      catch (error) {
+        console.error('Error fetching projects:', error);
+      }
+      finally {
+        setLoading(false);
+      }
+    }
+    fetchProjects();
+  }, [selectedCategory, selectedBudget, sortBy, debouncedSearchTerm])
+
+
 
   // Mock data - replace with actual API calls
   const stats = {
@@ -60,10 +99,10 @@ export const DevHome = () => {
   ];
 
   const sortOptions = [
-    { value: "latest", label: "Latest Posted" },
-    { value: "budget-high", label: "Highest Budget" },
-    { value: "budget-low", label: "Lowest Budget" },
-    { value: "deadline", label: "Closest Deadline" }
+    { value: "highest_budget", label: "Highest Budget" },
+    { value: "lowest_budget", label: "Lowest Budget" },
+    { value: "oldest", label: "Oldest Posted" },
+    { value: "newest", label: "Newest Posted" }
   ];
 
   const StatCard = ({ icon, title, value, subtitle, color }: any) => (
@@ -228,9 +267,10 @@ export const DevHome = () => {
                 <button
                   onClick={() => {
                     setSearchTerm("");
+                    setDebouncedSearchTerm("");
                     setSelectedCategory("all");
                     setSelectedBudget("all");
-                    setSortBy("latest");
+                    setSortBy("newest");
                   }}
                   className="w-full px-4 py-3 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-xl font-medium transition-colors"
                 >
@@ -245,19 +285,27 @@ export const DevHome = () => {
             <div className="flex items-center justify-between mb-6">
               <h2 className={`text-2xl font-bold ${textClr}`}>Available Projects</h2>
               <div className="flex items-center gap-4">
-                <span className={`text-sm ${subtleText}`}>12 projects found</span>
-                <button className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors">
-                  <HiOutlineFilter className="w-4 h-4" />
-                  Filter
-                </button>
+                <span className={`text-sm ${subtleText}`}>
+                  {loading ? "Loading..." : `${projects.length} project${projects.length !== 1 ? 's' : ''} found`}
+                </span>
               </div>
             </div>
 
             <div className="space-y-6">
-              {/* Multiple ProjectCard instances */}
-              {[1, 2, 3, 4, 5].map((index) => (
-                <ProjectCard key={index} />
-              ))}
+              {loading ? (
+                <div className="flex justify-center items-center py-12">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+                </div>
+              ) : projects.length === 0 ? (
+                <div className={`text-center py-12 ${bgCard} rounded-2xl border ${borderClr}`}>
+                  <p className={`text-lg ${subtleText}`}>No projects found matching your criteria.</p>
+                </div>
+              ) : (
+                /* Multiple ProjectCard instances */
+                projects.map((project: any, i: number) => (
+                  <ProjectCard key={i} {...project} />
+                ))
+              )}
             </div>
 
             {/* Load More */}

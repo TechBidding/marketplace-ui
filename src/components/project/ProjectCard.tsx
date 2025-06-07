@@ -11,15 +11,28 @@ import {
   HiOutlineChevronRight,
   HiOutlineBadgeCheck
 } from "react-icons/hi";
+import { useNavigate } from "react-router-dom";
 
 export interface ProjectCardProps {
-  title?: string;
-  category?: string;
-  description?: string;
-  deadline?: string; // ISO date string
-  status?: "In Progress" | "Completed" | "Draft" | "Open";
-  onClick?: () => void;
+  _id: string;
+  title: string;
+  description: string;
+  pricing: {
+    amount: number;
+    currency: string;
+  };
+  serviceType: string[];
+  requiredSkills: string[];
+  requirements: string[];
+  deadline: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  totalBids: number;
+  clientId: string;
 }
+
+
 
 const DUMMY_PROJECT = {
   title: "Build a Modern E-commerce Platform",
@@ -45,6 +58,7 @@ const DUMMY_PROJECT = {
   verified: true
 };
 
+
 const statusColors = {
   light: {
     "In Progress": "bg-blue-100 text-blue-700 border-blue-200",
@@ -60,11 +74,24 @@ const statusColors = {
   },
 } as const;
 
-export const ProjectCard = ({ title, status = "Open", onClick }: ProjectCardProps) => {
+export const ProjectCard = ({ 
+  _id,
+  title,
+  description,
+  pricing,
+  serviceType,
+  requiredSkills,
+  requirements,
+  deadline,
+  status,
+  createdAt,
+  updatedAt,
+  totalBids,
+  clientId,
+ }: ProjectCardProps) => {
   const { theme } = useTheme();
   const isDark = theme === "dark";
-
-  const project = { ...DUMMY_PROJECT, title: title || DUMMY_PROJECT.title, status };
+  const navigate = useNavigate();
 
   const bgCard = isDark ? "bg-gray-800/50 backdrop-blur-xl" : "bg-white/80 backdrop-blur-xl";
   const borderClr = isDark ? "border-gray-700/50" : "border-gray-200/50";
@@ -83,11 +110,15 @@ export const ProjectCard = ({ title, status = "Open", onClick }: ProjectCardProp
     }
   };
 
-  const daysSincePosted = Math.floor((new Date().getTime() - new Date(project.postedAt).getTime()) / (1000 * 3600 * 24));
+  const daysSincePosted = Math.floor((new Date().getTime() - new Date(createdAt).getTime()) / (1000 * 3600 * 24));
+
+  const handleClick = () => {
+    navigate(`/projects/${_id}`);
+  }
 
   return (
     <div
-      onClick={onClick}
+      onClick={handleClick}
       className={`group ${bgCard} rounded-2xl border ${borderClr} p-6 transition-all duration-300 cursor-pointer ${hoverBg} hover:shadow-xl hover:-translate-y-1`}
     >
       {/* Header Section */}
@@ -98,7 +129,7 @@ export const ProjectCard = ({ title, status = "Open", onClick }: ProjectCardProp
               {status === "Open" && <span className="w-2 h-2 bg-current rounded-full mr-1.5 animate-pulse"></span>}
               {status}
             </span>
-            {project.verified && (
+            {/* {project.verified && (
               <div className="flex items-center gap-1 text-blue-600 dark:text-blue-400">
                 <HiOutlineBadgeCheck className="w-4 h-4" />
                 <span className="text-xs font-medium">Verified</span>
@@ -106,10 +137,10 @@ export const ProjectCard = ({ title, status = "Open", onClick }: ProjectCardProp
             )}
             <span className={`text-xs ${getUrgencyColor(project.urgency)} font-medium`}>
               {project.urgency} Priority
-            </span>
+            </span> */}
           </div>
           <h3 className={`text-xl font-bold ${textClr} mb-2 line-clamp-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors`}>
-            {project.title}
+            {title}
           </h3>
         </div>
         <HiOutlineChevronRight className={`w-5 h-5 ${subtleText} group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors flex-shrink-0 ml-4`} />
@@ -117,12 +148,12 @@ export const ProjectCard = ({ title, status = "Open", onClick }: ProjectCardProp
 
       {/* Description */}
       <p className={`${subtleText} text-sm leading-relaxed mb-4 line-clamp-3`}>
-        {project.description}
+        {description}
       </p>
 
       {/* Skills Tags */}
       <div className="flex flex-wrap gap-2 mb-4">
-        {project.skills.slice(0, 4).map((skill, index) => (
+        {requiredSkills?.slice(0, 4).map((skill, index) => (
           <span
             key={index}
             className="px-3 py-1 bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-xs font-medium rounded-full"
@@ -130,9 +161,9 @@ export const ProjectCard = ({ title, status = "Open", onClick }: ProjectCardProp
             {skill}
           </span>
         ))}
-        {project.skills.length > 4 && (
+        {requiredSkills?.length > 4 && (
           <span className={`px-3 py-1 ${isDark ? 'bg-gray-700' : 'bg-gray-100'} ${subtleText} text-xs rounded-full`}>
-            +{project.skills.length - 4} more
+            +{requiredSkills.length - 4} more
           </span>
         )}
       </div>
@@ -142,22 +173,22 @@ export const ProjectCard = ({ title, status = "Open", onClick }: ProjectCardProp
         <div className="flex items-center gap-2">
           <HiOutlineCurrencyDollar className={`w-4 h-4 ${subtleText}`} />
           <div>
-            <p className={`text-sm font-semibold ${textClr}`}>{project.budget}</p>
+            <p className={`text-sm font-semibold ${textClr}`}>{pricing?.amount} {pricing?.currency}</p>
             <p className={`text-xs ${subtleText}`}>Budget</p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        {/* <div className="flex items-center gap-2">
           <HiOutlineClock className={`w-4 h-4 ${subtleText}`} />
           <div>
-            <p className={`text-sm font-semibold ${textClr}`}>{project.timeframe}</p>
+            <p className={`text-sm font-semibold ${textClr}`}>{deadline ? new Date(deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'N/A'}</p>
             <p className={`text-xs ${subtleText}`}>Duration</p>
           </div>
-        </div>
+        </div> */}
         <div className="flex items-center gap-2">
           <HiOutlineCalendar className={`w-4 h-4 ${subtleText}`} />
           <div>
             <p className={`text-sm font-semibold ${textClr}`}>
-              {new Date(project.deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+              {new Date(deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
             </p>
             <p className={`text-xs ${subtleText}`}>Deadline</p>
           </div>
@@ -165,7 +196,7 @@ export const ProjectCard = ({ title, status = "Open", onClick }: ProjectCardProp
         <div className="flex items-center gap-2">
           <HiOutlineLocationMarker className={`w-4 h-4 ${subtleText}`} />
           <div>
-            <p className={`text-sm font-semibold ${textClr}`}>{project.location}</p>
+            <p className={`text-sm font-semibold ${textClr}`}>Remote</p>
             <p className={`text-xs ${subtleText}`}>Location</p>
           </div>
         </div>
@@ -176,19 +207,19 @@ export const ProjectCard = ({ title, status = "Open", onClick }: ProjectCardProp
         {/* Client Info */}
         <div className="flex items-center gap-3">
           <img
-            src={project.client.avatar}
-            alt={project.client.name}
+            src={DUMMY_PROJECT.client.avatar}
+            alt={DUMMY_PROJECT.client.name}
             className="w-10 h-10 rounded-full object-cover ring-2 ring-white/20"
           />
           <div>
-            <p className={`text-sm font-semibold ${textClr}`}>{project.client.name}</p>
+            <p className={`text-sm font-semibold ${textClr}`}>{DUMMY_PROJECT.client.name}</p>
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-1">
                 <span className="text-yellow-500">★</span>
-                <span className={`text-xs ${subtleText}`}>{project.client.rating}</span>
+                <span className={`text-xs ${subtleText}`}>{DUMMY_PROJECT.client.rating}</span>
               </div>
               <span className={`text-xs ${subtleText}`}>•</span>
-              <span className={`text-xs ${subtleText}`}>{project.client.projectsPosted} projects</span>
+              <span className={`text-xs ${subtleText}`}>{DUMMY_PROJECT.client.projectsPosted} projects</span>
             </div>
           </div>
         </div>
@@ -197,7 +228,7 @@ export const ProjectCard = ({ title, status = "Open", onClick }: ProjectCardProp
         <div className="flex items-center gap-4 text-right">
           <div className="flex items-center gap-1">
             <HiOutlineEye className={`w-4 h-4 ${subtleText}`} />
-            <span className={`text-sm ${subtleText}`}>{project.bidsCount} bids</span>
+            <span className={`text-sm ${subtleText}`}>{totalBids} bids</span>
           </div>
           <div className="flex items-center gap-1">
             <HiOutlineTrendingUp className={`w-4 h-4 ${subtleText}`} />
