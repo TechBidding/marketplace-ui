@@ -12,6 +12,7 @@ import {
   HiOutlineBadgeCheck
 } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
+import { ClientInfo } from "../../utility/Schema/clientInfoSchema";
 
 export interface ProjectCardProps {
   _id: string;
@@ -29,7 +30,7 @@ export interface ProjectCardProps {
   createdAt: string;
   updatedAt: string;
   totalBids: number;
-  clientId: string;
+  clientInfo: ClientInfo;
 }
 
 
@@ -87,11 +88,12 @@ export const ProjectCard = ({
   createdAt,
   updatedAt,
   totalBids,
-  clientId,
+  clientInfo
  }: ProjectCardProps) => {
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const navigate = useNavigate();
+
 
   const bgCard = isDark ? "bg-gray-800/50 backdrop-blur-xl" : "bg-white/80 backdrop-blur-xl";
   const borderClr = isDark ? "border-gray-700/50" : "border-gray-200/50";
@@ -207,8 +209,8 @@ export const ProjectCard = ({
         {/* Client Info */}
         <div className="flex items-center gap-3">
           <img
-            src={DUMMY_PROJECT.client.avatar}
-            alt={DUMMY_PROJECT.client.name}
+            src={clientInfo?.profilePicture}
+            alt={clientInfo?.name}
             className="w-10 h-10 rounded-full object-cover ring-2 ring-white/20"
           />
           <div>
