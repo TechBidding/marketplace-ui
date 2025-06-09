@@ -6,13 +6,14 @@ import { useTheme } from "../../components/theme-provider";
 import { projectHttp } from "@/utility/api";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { ChartArea, Loader2 } from "lucide-react";
 
 import { useSelector } from "react-redux";
 import BidPopup from "./BidPopup";
 import { BidCard } from "./BidCard";
 import { CreateMilestone } from "@/components/CreateMilestone";
 import { Milestones } from "../Milestone/Milestones";
+import { Chat } from "@/components/chat/chat";
 
 type BidStatus = "pending" | "rejected" | "accepted";
 export interface UserBidType {
@@ -97,6 +98,7 @@ export default function ProjectDetails() {
 
   const [project, setProject] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [showChat, setShowChat] = useState(false);
   const { id } = useParams();
 
   const user_type = useSelector((state: any) => state.auth.userType);
@@ -534,7 +536,7 @@ export default function ProjectDetails() {
                   <h3 className={`text-lg font-semibold ${textClr} mb-4`}>Communication</h3>
                   <button className="flex items-center gap-3 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 p-3 rounded-lg w-full transition-colors">
                     <HiOutlineChatAlt2 className="h-5 w-5" />
-                    <span className="font-medium">Open Chat</span>
+                    <span className="font-medium" onClick={() => setShowChat(!showChat)}>Open Chat</span>
                   </button>
                 </div>
               </aside>
@@ -542,6 +544,7 @@ export default function ProjectDetails() {
           </div>
         </div>
       </div>
+      {showChat && <Chat projectId={project._id} onClick={() => setShowChat(false)} />}
     </div>
   );
 }
