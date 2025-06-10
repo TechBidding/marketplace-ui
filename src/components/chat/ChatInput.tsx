@@ -1,25 +1,20 @@
 import React, { useState } from 'react'
 import { useTheme } from '../theme-provider'
 import { Button } from '../ui/button'
-import { IoSend, IoAttach } from 'react-icons/io5'  
+import { IoSend, IoAttach } from 'react-icons/io5'
+import { projectHttp } from '@/utility/api'
 
-export const ChatInput = () => {
+export const ChatInput = ({ handleSend }: { handleSend: (message: string) => void }) => {
     const { theme } = useTheme()
     const isDark = theme === "dark"
     const [message, setMessage] = useState('')
 
-    const handleSend = () => {
-        if (message.trim()) {
-            // TODO: Implement send message functionality
-            console.log('Sending message:', message)
-            setMessage('')
-        }
-    }
 
     const handleKeyPress = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault()
-            handleSend()
+            handleSend(message)
+            setMessage('')
         }
     }
 
@@ -55,7 +50,12 @@ export const ChatInput = () => {
 
                 {/* Send Button */}
                 <Button
-                    onClick={handleSend}
+                    onClick={() => {
+                        if (message.trim()) {
+                            handleSend(message)
+                            setMessage('')
+                        }
+                    }}
                     disabled={!message.trim()}
                     className={`shrink-0 transition-all duration-200 hover:scale-105 ${message.trim()
                         ? 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-md hover:shadow-lg'

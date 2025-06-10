@@ -544,7 +544,7 @@ export default function ProjectDetails() {
           </div>
         </div>
       </div>
-      {showChat && <Chat projectId={project._id} onClick={() => setShowChat(false)} />}
+      {showChat && <Chat projectId={project._id} userId={userDetails._id} onClick={() => setShowChat(false)} />}
     </div>
   );
 }
