@@ -534,10 +534,15 @@ export default function ProjectDetails() {
 
                 <div className={`${cardBg} rounded-2xl border ${borderClr} p-6`}>
                   <h3 className={`text-lg font-semibold ${textClr} mb-4`}>Communication</h3>
-                  <button className="flex items-center gap-3 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 p-3 rounded-lg w-full transition-colors">
-                    <HiOutlineChatAlt2 className="h-5 w-5" />
-                    <span className="font-medium" onClick={() => setShowChat(!showChat)}>Open Chat</span>
-                  </button>
+                  {!project.acceptedBid ? (
+                    <span className="text-sm text-gray-500"> No chat available </span>
+                  ): (
+                    <button className = "flex items-center gap-3 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 p-3 rounded-lg w-full transition-colors" disabled = {!project.acceptedBid}>
+                  <HiOutlineChatAlt2 className="h-5 w-5" />
+                  <span className="font-medium" onClick={() => setShowChat(!showChat)}>Open Chat</span>
+                </button>
+                  )}
+                  
                 </div>
               </aside>
             )}
